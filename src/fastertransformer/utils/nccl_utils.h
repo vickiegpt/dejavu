@@ -131,8 +131,12 @@ void ftNcclInitialize(NcclParam& tensor_para,
                       const int  rank,
                       const bool with_mpi = true);
 
-void ftNcclCacheInitialize(NcclParam& cache_para, const int cache_para_size, const int torch_rank, const bool with_mpi = true);
+void ftNcclCacheInitialize(
+    NcclParam& cache_para, const int cache_para_size, const int torch_rank, const bool with_mpi = true);
+
+#if defined(BUILD_MULTI_GPU) && !defined(__CUDA_ARCH__)
 void initNcclUniqueId(ncclUniqueId* ncclId, std::string ip_addr, uint16_t port);
+#endif
 
 size_t getLocalBatchSize(const size_t batch_size, const size_t seq_len, const size_t pipeline_para_size);
 

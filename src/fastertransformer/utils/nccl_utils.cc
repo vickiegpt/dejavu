@@ -17,7 +17,7 @@
 #include "src/fastertransformer/utils/nccl_utils.h"
 
 namespace fastertransformer {
-
+#define BUILD_MULTI_GPU
 #ifdef BUILD_MULTI_GPU
 template<typename T>
 ncclDataType_t getNcclDataType()
@@ -477,7 +477,9 @@ void ftNcclInitialize(NcclParam& tensor_para,
     FT_LOG_DEBUG("%s stop", __PRETTY_FUNCTION__);
 }
 
-void initNcclUniqueId(ncclUniqueId* ncclId, std::string ip_addr, uint16_t port) {
+#if defined(BUILD_MULTI_GPU)
+void initNcclUniqueId(ncclUniqueId* ncclId, std::string ip_addr, uint16_t port)
+{
 
     memset(ncclId->internal, 0, sizeof(ncclId->internal));
     // NET
@@ -499,6 +501,7 @@ void initNcclUniqueId(ncclUniqueId* ncclId, std::string ip_addr, uint16_t port) 
     ncclId->internal[7] = std::stoi(ip_tokens[3]);
 
 }
+#endif
 
 void ftNcclCacheInitialize(NcclParam& cache_para, const int cache_para_size, const int torch_rank, const bool with_mpi)
 {

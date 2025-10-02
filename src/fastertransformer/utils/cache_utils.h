@@ -1,3 +1,5 @@
+#pragma once
+
 #include <algorithm>
 #include <cuda_runtime.h>
 #include <iostream>
@@ -5,6 +7,7 @@
 // #include <arpa/inet.h>
 // #include <linux/if.h>
 #include <boost/asio.hpp>
+#define BUILD_MULTI_GPU
 #ifdef BUILD_MULTI_GPU
 #include <mpi.h>
 #include <nccl.h>
@@ -12,7 +15,10 @@
 
 #include "src/fastertransformer/kernels/decoding_kernels.h"
 
-#define CUDACHECK(cmd)                                                                                                 \
+#ifdef CUDACHECK
+#undef CUDACHECK
+#endif
+#define CUDACHECK(cmd)                                                                                                \
     do {                                                                                                               \
         cudaError_t e = cmd;                                                                                           \
         if (e != cudaSuccess) {                                                                                        \
@@ -22,6 +28,9 @@
     } while (0)
 
 #ifdef BUILD_MULTI_GPU
+#ifdef MPICHECK
+#undef MPICHECK
+#endif
 #define MPICHECK(cmd)                                                                                                  \
     do {                                                                                                               \
         int e = cmd;                                                                                                   \
@@ -34,7 +43,10 @@
 #define MPICHECK(cmd) printf("[WARNING] No MPI\n");
 #endif
 
-#define NCCLCHECK(cmd)                                                                                                 \
+#ifdef NCCLCHECK
+#undef NCCLCHECK
+#endif
+#define NCCLCHECK(cmd)                                                                                                \
     do {                                                                                                               \
         ncclResult_t r = cmd;                                                                                          \
         if (r != ncclSuccess) {                                                                                        \

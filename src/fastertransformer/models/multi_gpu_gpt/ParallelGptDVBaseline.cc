@@ -29,6 +29,7 @@
 #include <chrono>
 #include <fstream>
 #include <iterator>
+#include <limits>
 #include <unistd.h>
 
 using std::chrono::high_resolution_clock;
