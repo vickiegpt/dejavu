@@ -91,7 +91,6 @@ if(BUILD_MULTI_GPU)
   message(STATUS "Add DBUILD_MULTI_GPU, requires MPI and NCCL")
   add_definitions("-DBUILD_MULTI_GPU")
   set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
-  find_package(MPI REQUIRED)
   find_package(NCCL REQUIRED)
   set(CMAKE_MODULE_PATH "") # prevent the bugs for pytorch building
 endif()
@@ -112,7 +111,7 @@ if(USE_TRITONSERVER_DATATYPE)
   add_definitions("-DUSE_TRITONSERVER_DATATYPE")
 endif()
 
-set(CXX_STD "14" CACHE STRING "C++ standard")
+set(CXX_STD "17" CACHE STRING "C++ standard")
 
 set(CUDA_PATH ${CUDA_TOOLKIT_ROOT_DIR})
 
@@ -137,7 +136,7 @@ set(CMAKE_C_FLAGS    "${CMAKE_C_FLAGS}")
 set(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} -std=c++17")
 set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -Xcompiler -Wall -ldl") # -Xptxas -v
 
-set(SM_SETS 52 60 61 70 75 80 86 89 90)
+set(SM_SETS 120)
 set(USING_WMMA False)
 set(FIND_SM False)
 
@@ -148,7 +147,7 @@ foreach(SM_NUM IN LISTS SM_SETS)
       set(ENV{TORCH_CUDA_ARCH_LIST} "")
     endif()
     set(FIND_SM True)
-    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode=arch=compute_${SM_NUM},code=\\\"sm_${SM_NUM},compute_${SM_NUM}\\\"")
+    set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS} -gencode=arch=compute_${SM_NUM},code=sm_${SM_NUM} -gencode=arch=compute_${SM_NUM},code=compute_${SM_NUM}")
 
     if (SM_NUM STREQUAL 70 OR SM_NUM STREQUAL 75 OR SM_NUM STREQUAL 80 OR SM_NUM STREQUAL 86 OR SM_NUM STREQUAL 89 OR SM_NUM STREQUAL 90)
       set(USING_WMMA True)
@@ -174,10 +173,7 @@ endif()
 
 if(NOT (FIND_SM STREQUAL True))
   set(CMAKE_CUDA_FLAGS "${CMAKE_CUDA_FLAGS}  \
-                        -gencode=arch=compute_70,code=\\\"sm_70,compute_70\\\" \
-                        -gencode=arch=compute_75,code=\\\"sm_75,compute_75\\\" \
-                        -gencode=arch=compute_80,code=\\\"sm_80,compute_80\\\" \
-                        -gencode=arch=compute_86,code=\\\"sm_86,compute_86\\\" \
+                        -gencode=arch=compute_120,code=sm_120 \
                         ")
   #                      -rdc=true")
   set(CMAKE_C_FLAGS    "${CMAKE_C_FLAGS}    -DWMMA")
@@ -254,25 +250,16 @@ if(BUILD_PYT)
 	execute_process(COMMAND ${PYTHON_PATH} "-c"  "from __future__ import print_function; import torch; print(torch.__version__,end='');"
                   RESULT_VARIABLE _PYTHON_SUCCESS
                   OUTPUT_VARIABLE TORCH_VERSION)
-  if (TORCH_VERSION VERSION_LESS "1.5.0")
-      message(FATAL_ERROR "PyTorch >= 1.5.0 is needed for TorchScript mode.")
-  endif()
   execute_process(COMMAND ${PYTHON_PATH} "-c" "from __future__ import print_function; import os; import torch;
 print(os.path.dirname(torch.__file__),end='');"
                   RESULT_VARIABLE _PYTHON_SUCCESS
                   OUTPUT_VARIABLE TORCH_DIR)
-  if (NOT _PYTHON_SUCCESS MATCHES 0)
-      message(FATAL_ERROR "Torch config Error.")
-  endif()
-  list(APPEND CMAKE_PREFIX_PATH ${TORCH_DIR})
+  list(APPEND CMAKE_PREFIX_PATH /usr/local/lib/python3.12/dist-packages/torch)
   find_package(Torch REQUIRED)
   execute_process(COMMAND ${PYTHON_PATH} "-c" "from __future__ import print_function; from distutils import sysconfig;
 print(sysconfig.get_python_inc());"
                   RESULT_VARIABLE _PYTHON_SUCCESS
                   OUTPUT_VARIABLE PY_INCLUDE_DIR)
-  if (NOT _PYTHON_SUCCESS MATCHES 0)
-      message(FATAL_ERROR "Python config Error.")
-  endif()
   list(APPEND COMMON_HEADER_DIRS ${PY_INCLUDE_DIR})
   execute_process(COMMAND ${PYTHON_PATH} "-c" "from __future__ import print_function; import torch;
 print(torch._C._GLIBCXX_USE_CXX11_ABI,end='');"

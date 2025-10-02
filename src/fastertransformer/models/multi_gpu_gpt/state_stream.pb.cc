@@ -5,518 +5,314 @@
 
 #include <algorithm>
 
-#include <google/protobuf/stubs/common.h>
-#include <google/protobuf/stubs/port.h>
 #include <google/protobuf/io/coded_stream.h>
-#include <google/protobuf/wire_format_lite_inl.h>
+#include <google/protobuf/extension_set.h>
+#include <google/protobuf/wire_format_lite.h>
 #include <google/protobuf/descriptor.h>
 #include <google/protobuf/generated_message_reflection.h>
 #include <google/protobuf/reflection_ops.h>
 #include <google/protobuf/wire_format.h>
-// This is a temporary google only hack
-#ifdef GOOGLE_PROTOBUF_ENFORCE_UNIQUENESS
-#include "third_party/protobuf/version.h"
-#endif
 // @@protoc_insertion_point(includes)
+#include <google/protobuf/port_def.inc>
+
+PROTOBUF_PRAGMA_INIT_SEG
+
+namespace _pb = ::PROTOBUF_NAMESPACE_ID;
+namespace _pbi = _pb::internal;
 
 namespace dejavu {
-class PushRequestDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<PushRequest>
-      _instance;
-} _PushRequest_default_instance_;
-class PushResponseDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<PushResponse>
-      _instance;
-} _PushResponse_default_instance_;
-class CompleteRequestDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<CompleteRequest>
-      _instance;
-} _CompleteRequest_default_instance_;
-class CompleteResponseDefaultTypeInternal {
- public:
-  ::google::protobuf::internal::ExplicitlyConstructed<CompleteResponse>
-      _instance;
-} _CompleteResponse_default_instance_;
-}  // namespace dejavu
-namespace protobuf_state_5fstream_2eproto {
-static void InitDefaultsPushRequest() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::dejavu::_PushRequest_default_instance_;
-    new (ptr) ::dejavu::PushRequest();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::dejavu::PushRequest::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_PushRequest =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsPushRequest}, {}};
-
-static void InitDefaultsPushResponse() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::dejavu::_PushResponse_default_instance_;
-    new (ptr) ::dejavu::PushResponse();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::dejavu::PushResponse::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_PushResponse =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsPushResponse}, {}};
-
-static void InitDefaultsCompleteRequest() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::dejavu::_CompleteRequest_default_instance_;
-    new (ptr) ::dejavu::CompleteRequest();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::dejavu::CompleteRequest::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_CompleteRequest =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsCompleteRequest}, {}};
-
-static void InitDefaultsCompleteResponse() {
-  GOOGLE_PROTOBUF_VERIFY_VERSION;
-
-  {
-    void* ptr = &::dejavu::_CompleteResponse_default_instance_;
-    new (ptr) ::dejavu::CompleteResponse();
-    ::google::protobuf::internal::OnShutdownDestroyMessage(ptr);
-  }
-  ::dejavu::CompleteResponse::InitAsDefaultInstance();
-}
-
-::google::protobuf::internal::SCCInfo<0> scc_info_CompleteResponse =
-    {{ATOMIC_VAR_INIT(::google::protobuf::internal::SCCInfoBase::kUninitialized), 0, InitDefaultsCompleteResponse}, {}};
-
-void InitDefaults() {
-  ::google::protobuf::internal::InitSCC(&scc_info_PushRequest.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_PushResponse.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_CompleteRequest.base);
-  ::google::protobuf::internal::InitSCC(&scc_info_CompleteResponse.base);
-}
-
-::google::protobuf::Metadata file_level_metadata[4];
-
-const ::google::protobuf::uint32 TableStruct::offsets[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dejavu::PushRequest, _has_bits_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dejavu::PushRequest, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dejavu::PushResponse, _has_bits_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dejavu::PushResponse, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dejavu::PushResponse, slot_id_),
-  0,
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dejavu::CompleteRequest, _has_bits_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dejavu::CompleteRequest, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dejavu::CompleteRequest, slot_id_),
-  0,
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dejavu::CompleteResponse, _has_bits_),
-  GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(::dejavu::CompleteResponse, _internal_metadata_),
-  ~0u,  // no _extensions_
-  ~0u,  // no _oneof_case_
-  ~0u,  // no _weak_field_map_
-};
-static const ::google::protobuf::internal::MigrationSchema schemas[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-  { 0, 5, sizeof(::dejavu::PushRequest)},
-  { 5, 11, sizeof(::dejavu::PushResponse)},
-  { 12, 18, sizeof(::dejavu::CompleteRequest)},
-  { 19, 24, sizeof(::dejavu::CompleteResponse)},
-};
-
-static ::google::protobuf::Message const * const file_default_instances[] = {
-  reinterpret_cast<const ::google::protobuf::Message*>(&::dejavu::_PushRequest_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::dejavu::_PushResponse_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::dejavu::_CompleteRequest_default_instance_),
-  reinterpret_cast<const ::google::protobuf::Message*>(&::dejavu::_CompleteResponse_default_instance_),
-};
-
-void protobuf_AssignDescriptors() {
-  AddDescriptors();
-  AssignDescriptors(
-      "state_stream.proto", schemas, file_default_instances, TableStruct::offsets,
-      file_level_metadata, NULL, NULL);
-}
-
-void protobuf_AssignDescriptorsOnce() {
-  static ::google::protobuf::internal::once_flag once;
-  ::google::protobuf::internal::call_once(once, protobuf_AssignDescriptors);
-}
-
-void protobuf_RegisterTypes(const ::std::string&) GOOGLE_PROTOBUF_ATTRIBUTE_COLD;
-void protobuf_RegisterTypes(const ::std::string&) {
-  protobuf_AssignDescriptorsOnce();
-  ::google::protobuf::internal::RegisterAllTypes(file_level_metadata, 4);
-}
-
-void AddDescriptorsImpl() {
-  InitDefaults();
-  static const char descriptor[] GOOGLE_PROTOBUF_ATTRIBUTE_SECTION_VARIABLE(protodesc_cold) = {
-      "\n\022state_stream.proto\022\006dejavu\"\r\n\013PushRequ"
-      "est\"\037\n\014PushResponse\022\017\n\007slot_id\030\001 \002(\005\"\"\n\017"
-      "CompleteRequest\022\017\n\007slot_id\030\001 \002(\005\"\022\n\020Comp"
-      "leteResponse2\205\001\n\rDejaVuManager\0223\n\004Push\022\023"
-      ".dejavu.PushRequest\032\024.dejavu.PushRespons"
-      "e\"\000\022\?\n\010Complete\022\027.dejavu.CompleteRequest"
-      "\032\030.dejavu.CompleteResponse\"\000"
+PROTOBUF_CONSTEXPR PushRequest::PushRequest(
+    ::_pbi::ConstantInitialized) {}
+struct PushRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR PushRequestDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~PushRequestDefaultTypeInternal() {}
+  union {
+    PushRequest _instance;
   };
-  ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
-      descriptor, 268);
-  ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
-    "state_stream.proto", &protobuf_RegisterTypes);
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 PushRequestDefaultTypeInternal _PushRequest_default_instance_;
+PROTOBUF_CONSTEXPR PushResponse::PushResponse(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_._has_bits_)*/{}
+  , /*decltype(_impl_._cached_size_)*/{}
+  , /*decltype(_impl_.slot_id_)*/0} {}
+struct PushResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR PushResponseDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~PushResponseDefaultTypeInternal() {}
+  union {
+    PushResponse _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 PushResponseDefaultTypeInternal _PushResponse_default_instance_;
+PROTOBUF_CONSTEXPR CompleteRequest::CompleteRequest(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_._has_bits_)*/{}
+  , /*decltype(_impl_._cached_size_)*/{}
+  , /*decltype(_impl_.slot_id_)*/0} {}
+struct CompleteRequestDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR CompleteRequestDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~CompleteRequestDefaultTypeInternal() {}
+  union {
+    CompleteRequest _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 CompleteRequestDefaultTypeInternal _CompleteRequest_default_instance_;
+PROTOBUF_CONSTEXPR CompleteResponse::CompleteResponse(
+    ::_pbi::ConstantInitialized) {}
+struct CompleteResponseDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR CompleteResponseDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~CompleteResponseDefaultTypeInternal() {}
+  union {
+    CompleteResponse _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 CompleteResponseDefaultTypeInternal _CompleteResponse_default_instance_;
+}  // namespace dejavu
+static ::_pb::Metadata file_level_metadata_state_5fstream_2eproto[4];
+static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_state_5fstream_2eproto = nullptr;
+static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_state_5fstream_2eproto = nullptr;
+
+const uint32_t TableStruct_state_5fstream_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::dejavu::PushRequest, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::dejavu::PushResponse, _impl_._has_bits_),
+  PROTOBUF_FIELD_OFFSET(::dejavu::PushResponse, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::dejavu::PushResponse, _impl_.slot_id_),
+  0,
+  PROTOBUF_FIELD_OFFSET(::dejavu::CompleteRequest, _impl_._has_bits_),
+  PROTOBUF_FIELD_OFFSET(::dejavu::CompleteRequest, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::dejavu::CompleteRequest, _impl_.slot_id_),
+  0,
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::dejavu::CompleteResponse, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+};
+static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
+  { 0, -1, -1, sizeof(::dejavu::PushRequest)},
+  { 6, 13, -1, sizeof(::dejavu::PushResponse)},
+  { 14, 21, -1, sizeof(::dejavu::CompleteRequest)},
+  { 22, -1, -1, sizeof(::dejavu::CompleteResponse)},
+};
+
+static const ::_pb::Message* const file_default_instances[] = {
+  &::dejavu::_PushRequest_default_instance_._instance,
+  &::dejavu::_PushResponse_default_instance_._instance,
+  &::dejavu::_CompleteRequest_default_instance_._instance,
+  &::dejavu::_CompleteResponse_default_instance_._instance,
+};
+
+const char descriptor_table_protodef_state_5fstream_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
+  "\n\022state_stream.proto\022\006dejavu\"\r\n\013PushRequ"
+  "est\"\037\n\014PushResponse\022\017\n\007slot_id\030\001 \002(\005\"\"\n\017"
+  "CompleteRequest\022\017\n\007slot_id\030\001 \002(\005\"\022\n\020Comp"
+  "leteResponse2\205\001\n\rDejaVuManager\0223\n\004Push\022\023"
+  ".dejavu.PushRequest\032\024.dejavu.PushRespons"
+  "e\"\000\022\?\n\010Complete\022\027.dejavu.CompleteRequest"
+  "\032\030.dejavu.CompleteResponse\"\000"
+  ;
+static ::_pbi::once_flag descriptor_table_state_5fstream_2eproto_once;
+const ::_pbi::DescriptorTable descriptor_table_state_5fstream_2eproto = {
+    false, false, 268, descriptor_table_protodef_state_5fstream_2eproto,
+    "state_stream.proto",
+    &descriptor_table_state_5fstream_2eproto_once, nullptr, 0, 4,
+    schemas, file_default_instances, TableStruct_state_5fstream_2eproto::offsets,
+    file_level_metadata_state_5fstream_2eproto, file_level_enum_descriptors_state_5fstream_2eproto,
+    file_level_service_descriptors_state_5fstream_2eproto,
+};
+PROTOBUF_ATTRIBUTE_WEAK const ::_pbi::DescriptorTable* descriptor_table_state_5fstream_2eproto_getter() {
+  return &descriptor_table_state_5fstream_2eproto;
 }
 
-void AddDescriptors() {
-  static ::google::protobuf::internal::once_flag once;
-  ::google::protobuf::internal::call_once(once, AddDescriptorsImpl);
-}
-// Force AddDescriptors() to be called at dynamic initialization time.
-struct StaticDescriptorInitializer {
-  StaticDescriptorInitializer() {
-    AddDescriptors();
-  }
-} static_descriptor_initializer;
-}  // namespace protobuf_state_5fstream_2eproto
+// Force running AddDescriptors() at dynamic initialization time.
+PROTOBUF_ATTRIBUTE_INIT_PRIORITY2 static ::_pbi::AddDescriptorsRunner dynamic_init_dummy_state_5fstream_2eproto(&descriptor_table_state_5fstream_2eproto);
 namespace dejavu {
 
 // ===================================================================
 
-void PushRequest::InitAsDefaultInstance() {
-}
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+class PushRequest::_Internal {
+ public:
+};
 
-PushRequest::PushRequest()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  ::google::protobuf::internal::InitSCC(
-      &protobuf_state_5fstream_2eproto::scc_info_PushRequest.base);
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:dejavu.PushRequest)
+PushRequest::PushRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase(arena, is_message_owned) {
+  // @@protoc_insertion_point(arena_constructor:dejavu.PushRequest)
 }
 PushRequest::PushRequest(const PushRequest& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _has_bits_(from._has_bits_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  : ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase() {
+  PushRequest* const _this = this; (void)_this;
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   // @@protoc_insertion_point(copy_constructor:dejavu.PushRequest)
 }
 
-void PushRequest::SharedCtor() {
+
+
+
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData PushRequest::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyImpl,
+    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeImpl,
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*PushRequest::GetClassData() const { return &_class_data_; }
+
+
+
+
+
+
+
+::PROTOBUF_NAMESPACE_ID::Metadata PushRequest::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_state_5fstream_2eproto_getter, &descriptor_table_state_5fstream_2eproto_once,
+      file_level_metadata_state_5fstream_2eproto[0]);
 }
-
-PushRequest::~PushRequest() {
-  // @@protoc_insertion_point(destructor:dejavu.PushRequest)
-  SharedDtor();
-}
-
-void PushRequest::SharedDtor() {
-}
-
-void PushRequest::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const ::google::protobuf::Descriptor* PushRequest::descriptor() {
-  ::protobuf_state_5fstream_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_state_5fstream_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
-const PushRequest& PushRequest::default_instance() {
-  ::google::protobuf::internal::InitSCC(&protobuf_state_5fstream_2eproto::scc_info_PushRequest.base);
-  return *internal_default_instance();
-}
-
-
-void PushRequest::Clear() {
-// @@protoc_insertion_point(message_clear_start:dejavu.PushRequest)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  _has_bits_.Clear();
-  _internal_metadata_.Clear();
-}
-
-bool PushRequest::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:dejavu.PushRequest)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-  handle_unusual:
-    if (tag == 0) {
-      goto success;
-    }
-    DO_(::google::protobuf::internal::WireFormat::SkipField(
-          input, tag, _internal_metadata_.mutable_unknown_fields()));
-  }
-success:
-  // @@protoc_insertion_point(parse_success:dejavu.PushRequest)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:dejavu.PushRequest)
-  return false;
-#undef DO_
-}
-
-void PushRequest::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:dejavu.PushRequest)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:dejavu.PushRequest)
-}
-
-::google::protobuf::uint8* PushRequest::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
-  // @@protoc_insertion_point(serialize_to_array_start:dejavu.PushRequest)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:dejavu.PushRequest)
-  return target;
-}
-
-size_t PushRequest::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:dejavu.PushRequest)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void PushRequest::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:dejavu.PushRequest)
-  GOOGLE_DCHECK_NE(&from, this);
-  const PushRequest* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const PushRequest>(
-          &from);
-  if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:dejavu.PushRequest)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:dejavu.PushRequest)
-    MergeFrom(*source);
-  }
-}
-
-void PushRequest::MergeFrom(const PushRequest& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:dejavu.PushRequest)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-}
-
-void PushRequest::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:dejavu.PushRequest)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void PushRequest::CopyFrom(const PushRequest& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:dejavu.PushRequest)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool PushRequest::IsInitialized() const {
-  return true;
-}
-
-void PushRequest::Swap(PushRequest* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void PushRequest::InternalSwap(PushRequest* other) {
-  using std::swap;
-  swap(_has_bits_[0], other->_has_bits_[0]);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-}
-
-::google::protobuf::Metadata PushRequest::GetMetadata() const {
-  protobuf_state_5fstream_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_state_5fstream_2eproto::file_level_metadata[kIndexInFileMessages];
-}
-
 
 // ===================================================================
 
-void PushResponse::InitAsDefaultInstance() {
-}
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int PushResponse::kSlotIdFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+class PushResponse::_Internal {
+ public:
+  using HasBits = decltype(std::declval<PushResponse>()._impl_._has_bits_);
+  static void set_has_slot_id(HasBits* has_bits) {
+    (*has_bits)[0] |= 1u;
+  }
+  static bool MissingRequiredFields(const HasBits& has_bits) {
+    return ((has_bits[0] & 0x00000001) ^ 0x00000001) != 0;
+  }
+};
 
-PushResponse::PushResponse()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  ::google::protobuf::internal::InitSCC(
-      &protobuf_state_5fstream_2eproto::scc_info_PushResponse.base);
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:dejavu.PushResponse)
+PushResponse::PushResponse(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:dejavu.PushResponse)
 }
 PushResponse::PushResponse(const PushResponse& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _has_bits_(from._has_bits_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  slot_id_ = from.slot_id_;
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  PushResponse* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_._has_bits_){from._impl_._has_bits_}
+    , /*decltype(_impl_._cached_size_)*/{}
+    , decltype(_impl_.slot_id_){}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_impl_.slot_id_ = from._impl_.slot_id_;
   // @@protoc_insertion_point(copy_constructor:dejavu.PushResponse)
 }
 
-void PushResponse::SharedCtor() {
-  slot_id_ = 0;
+inline void PushResponse::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_._has_bits_){}
+    , /*decltype(_impl_._cached_size_)*/{}
+    , decltype(_impl_.slot_id_){0}
+  };
 }
 
 PushResponse::~PushResponse() {
   // @@protoc_insertion_point(destructor:dejavu.PushResponse)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
   SharedDtor();
 }
 
-void PushResponse::SharedDtor() {
+inline void PushResponse::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
 }
 
 void PushResponse::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
+  _impl_._cached_size_.Set(size);
 }
-const ::google::protobuf::Descriptor* PushResponse::descriptor() {
-  ::protobuf_state_5fstream_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_state_5fstream_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
-const PushResponse& PushResponse::default_instance() {
-  ::google::protobuf::internal::InitSCC(&protobuf_state_5fstream_2eproto::scc_info_PushResponse.base);
-  return *internal_default_instance();
-}
-
 
 void PushResponse::Clear() {
 // @@protoc_insertion_point(message_clear_start:dejavu.PushResponse)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  slot_id_ = 0;
-  _has_bits_.Clear();
-  _internal_metadata_.Clear();
+  _impl_.slot_id_ = 0;
+  _impl_._has_bits_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-bool PushResponse::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:dejavu.PushResponse)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+const char* PushResponse::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  _Internal::HasBits has_bits{};
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
       // required int32 slot_id = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
-          set_has_slot_id();
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &slot_id_)));
-        } else {
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          _Internal::set_has_slot_id(&has_bits);
+          _impl_.slot_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
           goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
     }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:dejavu.PushResponse)
-  return true;
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  _impl_._has_bits_.Or(has_bits);
+  return ptr;
 failure:
-  // @@protoc_insertion_point(parse_failure:dejavu.PushResponse)
-  return false;
-#undef DO_
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
 }
 
-void PushResponse::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:dejavu.PushResponse)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  cached_has_bits = _has_bits_[0];
-  // required int32 slot_id = 1;
-  if (cached_has_bits & 0x00000001u) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->slot_id(), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:dejavu.PushResponse)
-}
-
-::google::protobuf::uint8* PushResponse::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
+uint8_t* PushResponse::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:dejavu.PushResponse)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  cached_has_bits = _has_bits_[0];
+  cached_has_bits = _impl_._has_bits_[0];
   // required int32 slot_id = 1;
   if (cached_has_bits & 0x00000001u) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->slot_id(), target);
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(1, this->_internal_slot_id(), target);
   }
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:dejavu.PushResponse)
   return target;
@@ -526,54 +322,36 @@ size_t PushResponse::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:dejavu.PushResponse)
   size_t total_size = 0;
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
   // required int32 slot_id = 1;
-  if (has_slot_id()) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->slot_id());
+  if (_internal_has_slot_id()) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_slot_id());
   }
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void PushResponse::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:dejavu.PushResponse)
-  GOOGLE_DCHECK_NE(&from, this);
-  const PushResponse* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const PushResponse>(
-          &from);
-  if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:dejavu.PushResponse)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:dejavu.PushResponse)
-    MergeFrom(*source);
-  }
-}
-
-void PushResponse::MergeFrom(const PushResponse& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:dejavu.PushResponse)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  if (from.has_slot_id()) {
-    set_slot_id(from.slot_id());
-  }
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-void PushResponse::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:dejavu.PushResponse)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData PushResponse::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    PushResponse::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*PushResponse::GetClassData() const { return &_class_data_; }
+
+
+void PushResponse::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<PushResponse*>(&to_msg);
+  auto& from = static_cast<const PushResponse&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:dejavu.PushResponse)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from._internal_has_slot_id()) {
+    _this->_internal_set_slot_id(from._internal_slot_id());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void PushResponse::CopyFrom(const PushResponse& from) {
@@ -584,167 +362,150 @@ void PushResponse::CopyFrom(const PushResponse& from) {
 }
 
 bool PushResponse::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+  if (_Internal::MissingRequiredFields(_impl_._has_bits_)) return false;
   return true;
 }
 
-void PushResponse::Swap(PushResponse* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
 void PushResponse::InternalSwap(PushResponse* other) {
   using std::swap;
-  swap(slot_id_, other->slot_id_);
-  swap(_has_bits_[0], other->_has_bits_[0]);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
+  swap(_impl_.slot_id_, other->_impl_.slot_id_);
 }
 
-::google::protobuf::Metadata PushResponse::GetMetadata() const {
-  protobuf_state_5fstream_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_state_5fstream_2eproto::file_level_metadata[kIndexInFileMessages];
+::PROTOBUF_NAMESPACE_ID::Metadata PushResponse::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_state_5fstream_2eproto_getter, &descriptor_table_state_5fstream_2eproto_once,
+      file_level_metadata_state_5fstream_2eproto[1]);
 }
-
 
 // ===================================================================
 
-void CompleteRequest::InitAsDefaultInstance() {
-}
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-const int CompleteRequest::kSlotIdFieldNumber;
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+class CompleteRequest::_Internal {
+ public:
+  using HasBits = decltype(std::declval<CompleteRequest>()._impl_._has_bits_);
+  static void set_has_slot_id(HasBits* has_bits) {
+    (*has_bits)[0] |= 1u;
+  }
+  static bool MissingRequiredFields(const HasBits& has_bits) {
+    return ((has_bits[0] & 0x00000001) ^ 0x00000001) != 0;
+  }
+};
 
-CompleteRequest::CompleteRequest()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  ::google::protobuf::internal::InitSCC(
-      &protobuf_state_5fstream_2eproto::scc_info_CompleteRequest.base);
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:dejavu.CompleteRequest)
+CompleteRequest::CompleteRequest(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:dejavu.CompleteRequest)
 }
 CompleteRequest::CompleteRequest(const CompleteRequest& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _has_bits_(from._has_bits_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  slot_id_ = from.slot_id_;
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  CompleteRequest* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_._has_bits_){from._impl_._has_bits_}
+    , /*decltype(_impl_._cached_size_)*/{}
+    , decltype(_impl_.slot_id_){}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_impl_.slot_id_ = from._impl_.slot_id_;
   // @@protoc_insertion_point(copy_constructor:dejavu.CompleteRequest)
 }
 
-void CompleteRequest::SharedCtor() {
-  slot_id_ = 0;
+inline void CompleteRequest::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_._has_bits_){}
+    , /*decltype(_impl_._cached_size_)*/{}
+    , decltype(_impl_.slot_id_){0}
+  };
 }
 
 CompleteRequest::~CompleteRequest() {
   // @@protoc_insertion_point(destructor:dejavu.CompleteRequest)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
   SharedDtor();
 }
 
-void CompleteRequest::SharedDtor() {
+inline void CompleteRequest::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
 }
 
 void CompleteRequest::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
+  _impl_._cached_size_.Set(size);
 }
-const ::google::protobuf::Descriptor* CompleteRequest::descriptor() {
-  ::protobuf_state_5fstream_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_state_5fstream_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
-const CompleteRequest& CompleteRequest::default_instance() {
-  ::google::protobuf::internal::InitSCC(&protobuf_state_5fstream_2eproto::scc_info_CompleteRequest.base);
-  return *internal_default_instance();
-}
-
 
 void CompleteRequest::Clear() {
 // @@protoc_insertion_point(message_clear_start:dejavu.CompleteRequest)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  slot_id_ = 0;
-  _has_bits_.Clear();
-  _internal_metadata_.Clear();
+  _impl_.slot_id_ = 0;
+  _impl_._has_bits_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
-bool CompleteRequest::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:dejavu.CompleteRequest)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-    switch (::google::protobuf::internal::WireFormatLite::GetTagFieldNumber(tag)) {
+const char* CompleteRequest::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  _Internal::HasBits has_bits{};
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
       // required int32 slot_id = 1;
-      case 1: {
-        if (static_cast< ::google::protobuf::uint8>(tag) ==
-            static_cast< ::google::protobuf::uint8>(8u /* 8 & 0xFF */)) {
-          set_has_slot_id();
-          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
-                   ::google::protobuf::int32, ::google::protobuf::internal::WireFormatLite::TYPE_INT32>(
-                 input, &slot_id_)));
-        } else {
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          _Internal::set_has_slot_id(&has_bits);
+          _impl_.slot_id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
           goto handle_unusual;
-        }
-        break;
-      }
-
-      default: {
-      handle_unusual:
-        if (tag == 0) {
-          goto success;
-        }
-        DO_(::google::protobuf::internal::WireFormat::SkipField(
-              input, tag, _internal_metadata_.mutable_unknown_fields()));
-        break;
-      }
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
     }
-  }
-success:
-  // @@protoc_insertion_point(parse_success:dejavu.CompleteRequest)
-  return true;
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  _impl_._has_bits_.Or(has_bits);
+  return ptr;
 failure:
-  // @@protoc_insertion_point(parse_failure:dejavu.CompleteRequest)
-  return false;
-#undef DO_
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
 }
 
-void CompleteRequest::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:dejavu.CompleteRequest)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  cached_has_bits = _has_bits_[0];
-  // required int32 slot_id = 1;
-  if (cached_has_bits & 0x00000001u) {
-    ::google::protobuf::internal::WireFormatLite::WriteInt32(1, this->slot_id(), output);
-  }
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:dejavu.CompleteRequest)
-}
-
-::google::protobuf::uint8* CompleteRequest::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
+uint8_t* CompleteRequest::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
   // @@protoc_insertion_point(serialize_to_array_start:dejavu.CompleteRequest)
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
-  cached_has_bits = _has_bits_[0];
+  cached_has_bits = _impl_._has_bits_[0];
   // required int32 slot_id = 1;
   if (cached_has_bits & 0x00000001u) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteInt32ToArray(1, this->slot_id(), target);
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(1, this->_internal_slot_id(), target);
   }
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
   }
   // @@protoc_insertion_point(serialize_to_array_end:dejavu.CompleteRequest)
   return target;
@@ -754,54 +515,36 @@ size_t CompleteRequest::ByteSizeLong() const {
 // @@protoc_insertion_point(message_byte_size_start:dejavu.CompleteRequest)
   size_t total_size = 0;
 
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
   // required int32 slot_id = 1;
-  if (has_slot_id()) {
-    total_size += 1 +
-      ::google::protobuf::internal::WireFormatLite::Int32Size(
-        this->slot_id());
+  if (_internal_has_slot_id()) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_slot_id());
   }
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void CompleteRequest::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:dejavu.CompleteRequest)
-  GOOGLE_DCHECK_NE(&from, this);
-  const CompleteRequest* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const CompleteRequest>(
-          &from);
-  if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:dejavu.CompleteRequest)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:dejavu.CompleteRequest)
-    MergeFrom(*source);
-  }
-}
-
-void CompleteRequest::MergeFrom(const CompleteRequest& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:dejavu.CompleteRequest)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  if (from.has_slot_id()) {
-    set_slot_id(from.slot_id());
-  }
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
-void CompleteRequest::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:dejavu.CompleteRequest)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData CompleteRequest::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    CompleteRequest::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*CompleteRequest::GetClassData() const { return &_class_data_; }
+
+
+void CompleteRequest::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<CompleteRequest*>(&to_msg);
+  auto& from = static_cast<const CompleteRequest&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:dejavu.CompleteRequest)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from._internal_has_slot_id()) {
+    _this->_internal_set_slot_id(from._internal_slot_id());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
 void CompleteRequest::CopyFrom(const CompleteRequest& from) {
@@ -812,226 +555,83 @@ void CompleteRequest::CopyFrom(const CompleteRequest& from) {
 }
 
 bool CompleteRequest::IsInitialized() const {
-  if ((_has_bits_[0] & 0x00000001) != 0x00000001) return false;
+  if (_Internal::MissingRequiredFields(_impl_._has_bits_)) return false;
   return true;
 }
 
-void CompleteRequest::Swap(CompleteRequest* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
 void CompleteRequest::InternalSwap(CompleteRequest* other) {
   using std::swap;
-  swap(slot_id_, other->slot_id_);
-  swap(_has_bits_[0], other->_has_bits_[0]);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_._has_bits_[0], other->_impl_._has_bits_[0]);
+  swap(_impl_.slot_id_, other->_impl_.slot_id_);
 }
 
-::google::protobuf::Metadata CompleteRequest::GetMetadata() const {
-  protobuf_state_5fstream_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_state_5fstream_2eproto::file_level_metadata[kIndexInFileMessages];
+::PROTOBUF_NAMESPACE_ID::Metadata CompleteRequest::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_state_5fstream_2eproto_getter, &descriptor_table_state_5fstream_2eproto_once,
+      file_level_metadata_state_5fstream_2eproto[2]);
 }
-
 
 // ===================================================================
 
-void CompleteResponse::InitAsDefaultInstance() {
-}
-#if !defined(_MSC_VER) || _MSC_VER >= 1900
-#endif  // !defined(_MSC_VER) || _MSC_VER >= 1900
+class CompleteResponse::_Internal {
+ public:
+};
 
-CompleteResponse::CompleteResponse()
-  : ::google::protobuf::Message(), _internal_metadata_(NULL) {
-  ::google::protobuf::internal::InitSCC(
-      &protobuf_state_5fstream_2eproto::scc_info_CompleteResponse.base);
-  SharedCtor();
-  // @@protoc_insertion_point(constructor:dejavu.CompleteResponse)
+CompleteResponse::CompleteResponse(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase(arena, is_message_owned) {
+  // @@protoc_insertion_point(arena_constructor:dejavu.CompleteResponse)
 }
 CompleteResponse::CompleteResponse(const CompleteResponse& from)
-  : ::google::protobuf::Message(),
-      _internal_metadata_(NULL),
-      _has_bits_(from._has_bits_) {
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
+  : ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase() {
+  CompleteResponse* const _this = this; (void)_this;
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
   // @@protoc_insertion_point(copy_constructor:dejavu.CompleteResponse)
 }
 
-void CompleteResponse::SharedCtor() {
+
+
+
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData CompleteResponse::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyImpl,
+    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeImpl,
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*CompleteResponse::GetClassData() const { return &_class_data_; }
+
+
+
+
+
+
+
+::PROTOBUF_NAMESPACE_ID::Metadata CompleteResponse::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_state_5fstream_2eproto_getter, &descriptor_table_state_5fstream_2eproto_once,
+      file_level_metadata_state_5fstream_2eproto[3]);
 }
-
-CompleteResponse::~CompleteResponse() {
-  // @@protoc_insertion_point(destructor:dejavu.CompleteResponse)
-  SharedDtor();
-}
-
-void CompleteResponse::SharedDtor() {
-}
-
-void CompleteResponse::SetCachedSize(int size) const {
-  _cached_size_.Set(size);
-}
-const ::google::protobuf::Descriptor* CompleteResponse::descriptor() {
-  ::protobuf_state_5fstream_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_state_5fstream_2eproto::file_level_metadata[kIndexInFileMessages].descriptor;
-}
-
-const CompleteResponse& CompleteResponse::default_instance() {
-  ::google::protobuf::internal::InitSCC(&protobuf_state_5fstream_2eproto::scc_info_CompleteResponse.base);
-  return *internal_default_instance();
-}
-
-
-void CompleteResponse::Clear() {
-// @@protoc_insertion_point(message_clear_start:dejavu.CompleteResponse)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  // Prevent compiler warnings about cached_has_bits being unused
-  (void) cached_has_bits;
-
-  _has_bits_.Clear();
-  _internal_metadata_.Clear();
-}
-
-bool CompleteResponse::MergePartialFromCodedStream(
-    ::google::protobuf::io::CodedInputStream* input) {
-#define DO_(EXPRESSION) if (!GOOGLE_PREDICT_TRUE(EXPRESSION)) goto failure
-  ::google::protobuf::uint32 tag;
-  // @@protoc_insertion_point(parse_start:dejavu.CompleteResponse)
-  for (;;) {
-    ::std::pair<::google::protobuf::uint32, bool> p = input->ReadTagWithCutoffNoLastTag(127u);
-    tag = p.first;
-    if (!p.second) goto handle_unusual;
-  handle_unusual:
-    if (tag == 0) {
-      goto success;
-    }
-    DO_(::google::protobuf::internal::WireFormat::SkipField(
-          input, tag, _internal_metadata_.mutable_unknown_fields()));
-  }
-success:
-  // @@protoc_insertion_point(parse_success:dejavu.CompleteResponse)
-  return true;
-failure:
-  // @@protoc_insertion_point(parse_failure:dejavu.CompleteResponse)
-  return false;
-#undef DO_
-}
-
-void CompleteResponse::SerializeWithCachedSizes(
-    ::google::protobuf::io::CodedOutputStream* output) const {
-  // @@protoc_insertion_point(serialize_start:dejavu.CompleteResponse)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
-        _internal_metadata_.unknown_fields(), output);
-  }
-  // @@protoc_insertion_point(serialize_end:dejavu.CompleteResponse)
-}
-
-::google::protobuf::uint8* CompleteResponse::InternalSerializeWithCachedSizesToArray(
-    bool deterministic, ::google::protobuf::uint8* target) const {
-  (void)deterministic; // Unused
-  // @@protoc_insertion_point(serialize_to_array_start:dejavu.CompleteResponse)
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
-        _internal_metadata_.unknown_fields(), target);
-  }
-  // @@protoc_insertion_point(serialize_to_array_end:dejavu.CompleteResponse)
-  return target;
-}
-
-size_t CompleteResponse::ByteSizeLong() const {
-// @@protoc_insertion_point(message_byte_size_start:dejavu.CompleteResponse)
-  size_t total_size = 0;
-
-  if (_internal_metadata_.have_unknown_fields()) {
-    total_size +=
-      ::google::protobuf::internal::WireFormat::ComputeUnknownFieldsSize(
-        _internal_metadata_.unknown_fields());
-  }
-  int cached_size = ::google::protobuf::internal::ToCachedSize(total_size);
-  SetCachedSize(cached_size);
-  return total_size;
-}
-
-void CompleteResponse::MergeFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_merge_from_start:dejavu.CompleteResponse)
-  GOOGLE_DCHECK_NE(&from, this);
-  const CompleteResponse* source =
-      ::google::protobuf::internal::DynamicCastToGenerated<const CompleteResponse>(
-          &from);
-  if (source == NULL) {
-  // @@protoc_insertion_point(generalized_merge_from_cast_fail:dejavu.CompleteResponse)
-    ::google::protobuf::internal::ReflectionOps::Merge(from, this);
-  } else {
-  // @@protoc_insertion_point(generalized_merge_from_cast_success:dejavu.CompleteResponse)
-    MergeFrom(*source);
-  }
-}
-
-void CompleteResponse::MergeFrom(const CompleteResponse& from) {
-// @@protoc_insertion_point(class_specific_merge_from_start:dejavu.CompleteResponse)
-  GOOGLE_DCHECK_NE(&from, this);
-  _internal_metadata_.MergeFrom(from._internal_metadata_);
-  ::google::protobuf::uint32 cached_has_bits = 0;
-  (void) cached_has_bits;
-
-}
-
-void CompleteResponse::CopyFrom(const ::google::protobuf::Message& from) {
-// @@protoc_insertion_point(generalized_copy_from_start:dejavu.CompleteResponse)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-void CompleteResponse::CopyFrom(const CompleteResponse& from) {
-// @@protoc_insertion_point(class_specific_copy_from_start:dejavu.CompleteResponse)
-  if (&from == this) return;
-  Clear();
-  MergeFrom(from);
-}
-
-bool CompleteResponse::IsInitialized() const {
-  return true;
-}
-
-void CompleteResponse::Swap(CompleteResponse* other) {
-  if (other == this) return;
-  InternalSwap(other);
-}
-void CompleteResponse::InternalSwap(CompleteResponse* other) {
-  using std::swap;
-  swap(_has_bits_[0], other->_has_bits_[0]);
-  _internal_metadata_.Swap(&other->_internal_metadata_);
-}
-
-::google::protobuf::Metadata CompleteResponse::GetMetadata() const {
-  protobuf_state_5fstream_2eproto::protobuf_AssignDescriptorsOnce();
-  return ::protobuf_state_5fstream_2eproto::file_level_metadata[kIndexInFileMessages];
-}
-
 
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace dejavu
-namespace google {
-namespace protobuf {
-template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::dejavu::PushRequest* Arena::CreateMaybeMessage< ::dejavu::PushRequest >(Arena* arena) {
-  return Arena::CreateInternal< ::dejavu::PushRequest >(arena);
+PROTOBUF_NAMESPACE_OPEN
+template<> PROTOBUF_NOINLINE ::dejavu::PushRequest*
+Arena::CreateMaybeMessage< ::dejavu::PushRequest >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::dejavu::PushRequest >(arena);
 }
-template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::dejavu::PushResponse* Arena::CreateMaybeMessage< ::dejavu::PushResponse >(Arena* arena) {
-  return Arena::CreateInternal< ::dejavu::PushResponse >(arena);
+template<> PROTOBUF_NOINLINE ::dejavu::PushResponse*
+Arena::CreateMaybeMessage< ::dejavu::PushResponse >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::dejavu::PushResponse >(arena);
 }
-template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::dejavu::CompleteRequest* Arena::CreateMaybeMessage< ::dejavu::CompleteRequest >(Arena* arena) {
-  return Arena::CreateInternal< ::dejavu::CompleteRequest >(arena);
+template<> PROTOBUF_NOINLINE ::dejavu::CompleteRequest*
+Arena::CreateMaybeMessage< ::dejavu::CompleteRequest >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::dejavu::CompleteRequest >(arena);
 }
-template<> GOOGLE_PROTOBUF_ATTRIBUTE_NOINLINE ::dejavu::CompleteResponse* Arena::CreateMaybeMessage< ::dejavu::CompleteResponse >(Arena* arena) {
-  return Arena::CreateInternal< ::dejavu::CompleteResponse >(arena);
+template<> PROTOBUF_NOINLINE ::dejavu::CompleteResponse*
+Arena::CreateMaybeMessage< ::dejavu::CompleteResponse >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::dejavu::CompleteResponse >(arena);
 }
-}  // namespace protobuf
-}  // namespace google
+PROTOBUF_NAMESPACE_CLOSE
 
 // @@protoc_insertion_point(global_scope)
+#include <google/protobuf/port_undef.inc>

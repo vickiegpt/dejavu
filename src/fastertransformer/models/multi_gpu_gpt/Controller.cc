@@ -14,7 +14,7 @@ Status ControllerImpl::Reset(ServerContext* context, const ResetRequest* request
     }
     dead_found_   = false;
     min_step_set_ = false;
-    min_steps_.empty();
+    min_steps_.clear();
 
     std::atomic_thread_fence(std::memory_order_seq_cst);
     if (local_reset_ > 0) {
@@ -329,9 +329,9 @@ void Shutdown(ControllerImpl& service)
     //     }
     //     std::cout << std::endl;
     // }
-    service.health_status_.empty();
-    service.cache_replica_status_.empty();
-    service.health_set_.empty();
-    service.ubatch_tokens_.empty();
+    service.health_status_.clear();
+    service.cache_replica_status_.clear();
+    service.health_set_.clear();
+    service.ubatch_tokens_.clear();
     service.server->Shutdown();
 }

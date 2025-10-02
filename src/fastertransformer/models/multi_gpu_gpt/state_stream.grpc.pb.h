@@ -7,23 +7,23 @@
 #include "state_stream.pb.h"
 
 #include <functional>
-#include <grpcpp/impl/codegen/async_generic_service.h>
-#include <grpcpp/impl/codegen/async_stream.h>
-#include <grpcpp/impl/codegen/async_unary_call.h>
-#include <grpcpp/impl/codegen/method_handler_impl.h>
+#include <grpcpp/generic/async_generic_service.h>
+#include <grpcpp/support/async_stream.h>
+#include <grpcpp/support/async_unary_call.h>
+#include <grpcpp/support/client_callback.h>
+#include <grpcpp/client_context.h>
+#include <grpcpp/completion_queue.h>
+#include <grpcpp/support/message_allocator.h>
+#include <grpcpp/support/method_handler.h>
 #include <grpcpp/impl/codegen/proto_utils.h>
-#include <grpcpp/impl/codegen/rpc_method.h>
-#include <grpcpp/impl/codegen/service_type.h>
+#include <grpcpp/impl/rpc_method.h>
+#include <grpcpp/support/server_callback.h>
+#include <grpcpp/impl/codegen/server_callback_handlers.h>
+#include <grpcpp/server_context.h>
+#include <grpcpp/impl/service_type.h>
 #include <grpcpp/impl/codegen/status.h>
-#include <grpcpp/impl/codegen/stub_options.h>
-#include <grpcpp/impl/codegen/sync_stream.h>
-
-namespace grpc {
-class CompletionQueue;
-class Channel;
-class ServerCompletionQueue;
-class ServerContext;
-}  // namespace grpc
+#include <grpcpp/support/stub_options.h>
+#include <grpcpp/support/sync_stream.h>
 
 namespace dejavu {
 
@@ -49,14 +49,18 @@ class DejaVuManager final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::dejavu::CompleteResponse>> PrepareAsyncComplete(::grpc::ClientContext* context, const ::dejavu::CompleteRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::dejavu::CompleteResponse>>(PrepareAsyncCompleteRaw(context, request, cq));
     }
-    class experimental_async_interface {
+    class async_interface {
      public:
-      virtual ~experimental_async_interface() {}
+      virtual ~async_interface() {}
       virtual void Push(::grpc::ClientContext* context, const ::dejavu::PushRequest* request, ::dejavu::PushResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void Push(::grpc::ClientContext* context, const ::dejavu::PushRequest* request, ::dejavu::PushResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void Complete(::grpc::ClientContext* context, const ::dejavu::CompleteRequest* request, ::dejavu::CompleteResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void Complete(::grpc::ClientContext* context, const ::dejavu::CompleteRequest* request, ::dejavu::CompleteResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
     };
-    virtual class experimental_async_interface* experimental_async() { return nullptr; }
-  private:
+    typedef class async_interface experimental_async_interface;
+    virtual class async_interface* async() { return nullptr; }
+    class async_interface* experimental_async() { return async(); }
+   private:
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::dejavu::PushResponse>* AsyncPushRaw(::grpc::ClientContext* context, const ::dejavu::PushRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::dejavu::PushResponse>* PrepareAsyncPushRaw(::grpc::ClientContext* context, const ::dejavu::PushRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::dejavu::CompleteResponse>* AsyncCompleteRaw(::grpc::ClientContext* context, const ::dejavu::CompleteRequest& request, ::grpc::CompletionQueue* cq) = 0;
@@ -64,7 +68,7 @@ class DejaVuManager final {
   };
   class Stub final : public StubInterface {
    public:
-    Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel);
+    Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
     ::grpc::Status Push(::grpc::ClientContext* context, const ::dejavu::PushRequest& request, ::dejavu::PushResponse* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dejavu::PushResponse>> AsyncPush(::grpc::ClientContext* context, const ::dejavu::PushRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dejavu::PushResponse>>(AsyncPushRaw(context, request, cq));
@@ -79,22 +83,24 @@ class DejaVuManager final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dejavu::CompleteResponse>> PrepareAsyncComplete(::grpc::ClientContext* context, const ::dejavu::CompleteRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dejavu::CompleteResponse>>(PrepareAsyncCompleteRaw(context, request, cq));
     }
-    class experimental_async final :
-      public StubInterface::experimental_async_interface {
+    class async final :
+      public StubInterface::async_interface {
      public:
       void Push(::grpc::ClientContext* context, const ::dejavu::PushRequest* request, ::dejavu::PushResponse* response, std::function<void(::grpc::Status)>) override;
+      void Push(::grpc::ClientContext* context, const ::dejavu::PushRequest* request, ::dejavu::PushResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
       void Complete(::grpc::ClientContext* context, const ::dejavu::CompleteRequest* request, ::dejavu::CompleteResponse* response, std::function<void(::grpc::Status)>) override;
+      void Complete(::grpc::ClientContext* context, const ::dejavu::CompleteRequest* request, ::dejavu::CompleteResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
-      explicit experimental_async(Stub* stub): stub_(stub) { }
+      explicit async(Stub* stub): stub_(stub) { }
       Stub* stub() { return stub_; }
       Stub* stub_;
     };
-    class experimental_async_interface* experimental_async() override { return &async_stub_; }
+    class async* async() override { return &async_stub_; }
 
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
-    class experimental_async async_stub_{this};
+    class async async_stub_{this};
     ::grpc::ClientAsyncResponseReader< ::dejavu::PushResponse>* AsyncPushRaw(::grpc::ClientContext* context, const ::dejavu::PushRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::dejavu::PushResponse>* PrepareAsyncPushRaw(::grpc::ClientContext* context, const ::dejavu::PushRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::dejavu::CompleteResponse>* AsyncCompleteRaw(::grpc::ClientContext* context, const ::dejavu::CompleteRequest& request, ::grpc::CompletionQueue* cq) override;
@@ -114,7 +120,7 @@ class DejaVuManager final {
   template <class BaseClass>
   class WithAsyncMethod_Push : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_Push() {
       ::grpc::Service::MarkMethodAsync(0);
@@ -123,7 +129,7 @@ class DejaVuManager final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Push(::grpc::ServerContext* context, const ::dejavu::PushRequest* request, ::dejavu::PushResponse* response) override {
+    ::grpc::Status Push(::grpc::ServerContext* /*context*/, const ::dejavu::PushRequest* /*request*/, ::dejavu::PushResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -134,7 +140,7 @@ class DejaVuManager final {
   template <class BaseClass>
   class WithAsyncMethod_Complete : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_Complete() {
       ::grpc::Service::MarkMethodAsync(1);
@@ -143,7 +149,7 @@ class DejaVuManager final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Complete(::grpc::ServerContext* context, const ::dejavu::CompleteRequest* request, ::dejavu::CompleteResponse* response) override {
+    ::grpc::Status Complete(::grpc::ServerContext* /*context*/, const ::dejavu::CompleteRequest* /*request*/, ::dejavu::CompleteResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -153,9 +159,65 @@ class DejaVuManager final {
   };
   typedef WithAsyncMethod_Push<WithAsyncMethod_Complete<Service > > AsyncService;
   template <class BaseClass>
+  class WithCallbackMethod_Push : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_Push() {
+      ::grpc::Service::MarkMethodCallback(0,
+          new ::grpc::internal::CallbackUnaryHandler< ::dejavu::PushRequest, ::dejavu::PushResponse>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::dejavu::PushRequest* request, ::dejavu::PushResponse* response) { return this->Push(context, request, response); }));}
+    void SetMessageAllocatorFor_Push(
+        ::grpc::MessageAllocator< ::dejavu::PushRequest, ::dejavu::PushResponse>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(0);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::dejavu::PushRequest, ::dejavu::PushResponse>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_Push() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Push(::grpc::ServerContext* /*context*/, const ::dejavu::PushRequest* /*request*/, ::dejavu::PushResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* Push(
+      ::grpc::CallbackServerContext* /*context*/, const ::dejavu::PushRequest* /*request*/, ::dejavu::PushResponse* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_Complete : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_Complete() {
+      ::grpc::Service::MarkMethodCallback(1,
+          new ::grpc::internal::CallbackUnaryHandler< ::dejavu::CompleteRequest, ::dejavu::CompleteResponse>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::dejavu::CompleteRequest* request, ::dejavu::CompleteResponse* response) { return this->Complete(context, request, response); }));}
+    void SetMessageAllocatorFor_Complete(
+        ::grpc::MessageAllocator< ::dejavu::CompleteRequest, ::dejavu::CompleteResponse>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::dejavu::CompleteRequest, ::dejavu::CompleteResponse>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_Complete() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Complete(::grpc::ServerContext* /*context*/, const ::dejavu::CompleteRequest* /*request*/, ::dejavu::CompleteResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* Complete(
+      ::grpc::CallbackServerContext* /*context*/, const ::dejavu::CompleteRequest* /*request*/, ::dejavu::CompleteResponse* /*response*/)  { return nullptr; }
+  };
+  typedef WithCallbackMethod_Push<WithCallbackMethod_Complete<Service > > CallbackService;
+  typedef CallbackService ExperimentalCallbackService;
+  template <class BaseClass>
   class WithGenericMethod_Push : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_Push() {
       ::grpc::Service::MarkMethodGeneric(0);
@@ -164,7 +226,7 @@ class DejaVuManager final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Push(::grpc::ServerContext* context, const ::dejavu::PushRequest* request, ::dejavu::PushResponse* response) override {
+    ::grpc::Status Push(::grpc::ServerContext* /*context*/, const ::dejavu::PushRequest* /*request*/, ::dejavu::PushResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -172,7 +234,7 @@ class DejaVuManager final {
   template <class BaseClass>
   class WithGenericMethod_Complete : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_Complete() {
       ::grpc::Service::MarkMethodGeneric(1);
@@ -181,7 +243,7 @@ class DejaVuManager final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Complete(::grpc::ServerContext* context, const ::dejavu::CompleteRequest* request, ::dejavu::CompleteResponse* response) override {
+    ::grpc::Status Complete(::grpc::ServerContext* /*context*/, const ::dejavu::CompleteRequest* /*request*/, ::dejavu::CompleteResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -189,7 +251,7 @@ class DejaVuManager final {
   template <class BaseClass>
   class WithRawMethod_Push : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_Push() {
       ::grpc::Service::MarkMethodRaw(0);
@@ -198,7 +260,7 @@ class DejaVuManager final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Push(::grpc::ServerContext* context, const ::dejavu::PushRequest* request, ::dejavu::PushResponse* response) override {
+    ::grpc::Status Push(::grpc::ServerContext* /*context*/, const ::dejavu::PushRequest* /*request*/, ::dejavu::PushResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -209,7 +271,7 @@ class DejaVuManager final {
   template <class BaseClass>
   class WithRawMethod_Complete : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_Complete() {
       ::grpc::Service::MarkMethodRaw(1);
@@ -218,7 +280,7 @@ class DejaVuManager final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Complete(::grpc::ServerContext* context, const ::dejavu::CompleteRequest* request, ::dejavu::CompleteResponse* response) override {
+    ::grpc::Status Complete(::grpc::ServerContext* /*context*/, const ::dejavu::CompleteRequest* /*request*/, ::dejavu::CompleteResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -227,19 +289,70 @@ class DejaVuManager final {
     }
   };
   template <class BaseClass>
+  class WithRawCallbackMethod_Push : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_Push() {
+      ::grpc::Service::MarkMethodRawCallback(0,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Push(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_Push() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Push(::grpc::ServerContext* /*context*/, const ::dejavu::PushRequest* /*request*/, ::dejavu::PushResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* Push(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_Complete : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_Complete() {
+      ::grpc::Service::MarkMethodRawCallback(1,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Complete(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_Complete() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Complete(::grpc::ServerContext* /*context*/, const ::dejavu::CompleteRequest* /*request*/, ::dejavu::CompleteResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* Complete(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_Push : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_Push() {
       ::grpc::Service::MarkMethodStreamed(0,
-        new ::grpc::internal::StreamedUnaryHandler< ::dejavu::PushRequest, ::dejavu::PushResponse>(std::bind(&WithStreamedUnaryMethod_Push<BaseClass>::StreamedPush, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::dejavu::PushRequest, ::dejavu::PushResponse>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::dejavu::PushRequest, ::dejavu::PushResponse>* streamer) {
+                       return this->StreamedPush(context,
+                         streamer);
+                  }));
     }
     ~WithStreamedUnaryMethod_Push() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status Push(::grpc::ServerContext* context, const ::dejavu::PushRequest* request, ::dejavu::PushResponse* response) override {
+    ::grpc::Status Push(::grpc::ServerContext* /*context*/, const ::dejavu::PushRequest* /*request*/, ::dejavu::PushResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -249,17 +362,24 @@ class DejaVuManager final {
   template <class BaseClass>
   class WithStreamedUnaryMethod_Complete : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_Complete() {
       ::grpc::Service::MarkMethodStreamed(1,
-        new ::grpc::internal::StreamedUnaryHandler< ::dejavu::CompleteRequest, ::dejavu::CompleteResponse>(std::bind(&WithStreamedUnaryMethod_Complete<BaseClass>::StreamedComplete, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::dejavu::CompleteRequest, ::dejavu::CompleteResponse>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::dejavu::CompleteRequest, ::dejavu::CompleteResponse>* streamer) {
+                       return this->StreamedComplete(context,
+                         streamer);
+                  }));
     }
     ~WithStreamedUnaryMethod_Complete() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status Complete(::grpc::ServerContext* context, const ::dejavu::CompleteRequest* request, ::dejavu::CompleteResponse* response) override {
+    ::grpc::Status Complete(::grpc::ServerContext* /*context*/, const ::dejavu::CompleteRequest* /*request*/, ::dejavu::CompleteResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }

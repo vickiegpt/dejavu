@@ -6,15 +6,19 @@
 #include "ft_state.grpc.pb.h"
 
 #include <functional>
-#include <grpcpp/impl/codegen/async_stream.h>
-#include <grpcpp/impl/codegen/async_unary_call.h>
-#include <grpcpp/impl/codegen/channel_interface.h>
-#include <grpcpp/impl/codegen/client_unary_call.h>
-#include <grpcpp/impl/codegen/client_callback.h>
-#include <grpcpp/impl/codegen/method_handler_impl.h>
-#include <grpcpp/impl/codegen/rpc_service_method.h>
-#include <grpcpp/impl/codegen/service_type.h>
-#include <grpcpp/impl/codegen/sync_stream.h>
+#include <grpcpp/support/async_stream.h>
+#include <grpcpp/support/async_unary_call.h>
+#include <grpcpp/impl/channel_interface.h>
+#include <grpcpp/impl/client_unary_call.h>
+#include <grpcpp/support/client_callback.h>
+#include <grpcpp/support/message_allocator.h>
+#include <grpcpp/support/method_handler.h>
+#include <grpcpp/impl/rpc_service_method.h>
+#include <grpcpp/support/server_callback.h>
+#include <grpcpp/impl/codegen/server_callback_handlers.h>
+#include <grpcpp/server_context.h>
+#include <grpcpp/impl/service_type.h>
+#include <grpcpp/support/sync_stream.h>
 namespace dejavu_ft {
 
 static const char* Controller_method_names[] = {
@@ -30,190 +34,286 @@ static const char* Controller_method_names[] = {
 
 std::unique_ptr< Controller::Stub> Controller::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
   (void)options;
-  std::unique_ptr< Controller::Stub> stub(new Controller::Stub(channel));
+  std::unique_ptr< Controller::Stub> stub(new Controller::Stub(channel, options));
   return stub;
 }
 
-Controller::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
-  : channel_(channel), rpcmethod_SendHeartbeat_(Controller_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_SendCacheAck_(Controller_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_SendToken_(Controller_method_names[2], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_GetInfo_(Controller_method_names[3], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_Reset_(Controller_method_names[4], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_MarkUbatchFinished_(Controller_method_names[5], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_IsReady_(Controller_method_names[6], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_MarkRestart_(Controller_method_names[7], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+Controller::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
+  : channel_(channel), rpcmethod_SendHeartbeat_(Controller_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_SendCacheAck_(Controller_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_SendToken_(Controller_method_names[2], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_GetInfo_(Controller_method_names[3], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_Reset_(Controller_method_names[4], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_MarkUbatchFinished_(Controller_method_names[5], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_IsReady_(Controller_method_names[6], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_MarkRestart_(Controller_method_names[7], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status Controller::Stub::SendHeartbeat(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest& request, ::dejavu_ft::HeartBeatResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_SendHeartbeat_, context, request, response);
+  return ::grpc::internal::BlockingUnaryCall< ::dejavu_ft::HeartBeatRequest, ::dejavu_ft::HeartBeatResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_SendHeartbeat_, context, request, response);
 }
 
-void Controller::Stub::experimental_async::SendHeartbeat(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest* request, ::dejavu_ft::HeartBeatResponse* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SendHeartbeat_, context, request, response, std::move(f));
+void Controller::Stub::async::SendHeartbeat(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest* request, ::dejavu_ft::HeartBeatResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::dejavu_ft::HeartBeatRequest, ::dejavu_ft::HeartBeatResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_SendHeartbeat_, context, request, response, std::move(f));
 }
 
-::grpc::ClientAsyncResponseReader< ::dejavu_ft::HeartBeatResponse>* Controller::Stub::AsyncSendHeartbeatRaw(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu_ft::HeartBeatResponse>::Create(channel_.get(), cq, rpcmethod_SendHeartbeat_, context, request, true);
+void Controller::Stub::async::SendHeartbeat(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest* request, ::dejavu_ft::HeartBeatResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_SendHeartbeat_, context, request, response, reactor);
 }
 
 ::grpc::ClientAsyncResponseReader< ::dejavu_ft::HeartBeatResponse>* Controller::Stub::PrepareAsyncSendHeartbeatRaw(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu_ft::HeartBeatResponse>::Create(channel_.get(), cq, rpcmethod_SendHeartbeat_, context, request, false);
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::dejavu_ft::HeartBeatResponse, ::dejavu_ft::HeartBeatRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_SendHeartbeat_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::dejavu_ft::HeartBeatResponse>* Controller::Stub::AsyncSendHeartbeatRaw(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncSendHeartbeatRaw(context, request, cq);
+  result->StartCall();
+  return result;
 }
 
 ::grpc::Status Controller::Stub::SendCacheAck(::grpc::ClientContext* context, const ::dejavu_ft::CacheRequest& request, ::dejavu_ft::CacheResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_SendCacheAck_, context, request, response);
+  return ::grpc::internal::BlockingUnaryCall< ::dejavu_ft::CacheRequest, ::dejavu_ft::CacheResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_SendCacheAck_, context, request, response);
 }
 
-void Controller::Stub::experimental_async::SendCacheAck(::grpc::ClientContext* context, const ::dejavu_ft::CacheRequest* request, ::dejavu_ft::CacheResponse* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SendCacheAck_, context, request, response, std::move(f));
+void Controller::Stub::async::SendCacheAck(::grpc::ClientContext* context, const ::dejavu_ft::CacheRequest* request, ::dejavu_ft::CacheResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::dejavu_ft::CacheRequest, ::dejavu_ft::CacheResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_SendCacheAck_, context, request, response, std::move(f));
 }
 
-::grpc::ClientAsyncResponseReader< ::dejavu_ft::CacheResponse>* Controller::Stub::AsyncSendCacheAckRaw(::grpc::ClientContext* context, const ::dejavu_ft::CacheRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu_ft::CacheResponse>::Create(channel_.get(), cq, rpcmethod_SendCacheAck_, context, request, true);
+void Controller::Stub::async::SendCacheAck(::grpc::ClientContext* context, const ::dejavu_ft::CacheRequest* request, ::dejavu_ft::CacheResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_SendCacheAck_, context, request, response, reactor);
 }
 
 ::grpc::ClientAsyncResponseReader< ::dejavu_ft::CacheResponse>* Controller::Stub::PrepareAsyncSendCacheAckRaw(::grpc::ClientContext* context, const ::dejavu_ft::CacheRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu_ft::CacheResponse>::Create(channel_.get(), cq, rpcmethod_SendCacheAck_, context, request, false);
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::dejavu_ft::CacheResponse, ::dejavu_ft::CacheRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_SendCacheAck_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::dejavu_ft::CacheResponse>* Controller::Stub::AsyncSendCacheAckRaw(::grpc::ClientContext* context, const ::dejavu_ft::CacheRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncSendCacheAckRaw(context, request, cq);
+  result->StartCall();
+  return result;
 }
 
 ::grpc::Status Controller::Stub::SendToken(::grpc::ClientContext* context, const ::dejavu_ft::TokenRequest& request, ::dejavu_ft::TokenResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_SendToken_, context, request, response);
+  return ::grpc::internal::BlockingUnaryCall< ::dejavu_ft::TokenRequest, ::dejavu_ft::TokenResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_SendToken_, context, request, response);
 }
 
-void Controller::Stub::experimental_async::SendToken(::grpc::ClientContext* context, const ::dejavu_ft::TokenRequest* request, ::dejavu_ft::TokenResponse* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_SendToken_, context, request, response, std::move(f));
+void Controller::Stub::async::SendToken(::grpc::ClientContext* context, const ::dejavu_ft::TokenRequest* request, ::dejavu_ft::TokenResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::dejavu_ft::TokenRequest, ::dejavu_ft::TokenResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_SendToken_, context, request, response, std::move(f));
 }
 
-::grpc::ClientAsyncResponseReader< ::dejavu_ft::TokenResponse>* Controller::Stub::AsyncSendTokenRaw(::grpc::ClientContext* context, const ::dejavu_ft::TokenRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu_ft::TokenResponse>::Create(channel_.get(), cq, rpcmethod_SendToken_, context, request, true);
+void Controller::Stub::async::SendToken(::grpc::ClientContext* context, const ::dejavu_ft::TokenRequest* request, ::dejavu_ft::TokenResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_SendToken_, context, request, response, reactor);
 }
 
 ::grpc::ClientAsyncResponseReader< ::dejavu_ft::TokenResponse>* Controller::Stub::PrepareAsyncSendTokenRaw(::grpc::ClientContext* context, const ::dejavu_ft::TokenRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu_ft::TokenResponse>::Create(channel_.get(), cq, rpcmethod_SendToken_, context, request, false);
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::dejavu_ft::TokenResponse, ::dejavu_ft::TokenRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_SendToken_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::dejavu_ft::TokenResponse>* Controller::Stub::AsyncSendTokenRaw(::grpc::ClientContext* context, const ::dejavu_ft::TokenRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncSendTokenRaw(context, request, cq);
+  result->StartCall();
+  return result;
 }
 
 ::grpc::Status Controller::Stub::GetInfo(::grpc::ClientContext* context, const ::dejavu_ft::StartUpInfoRequest& request, ::dejavu_ft::StartUpInfoResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_GetInfo_, context, request, response);
+  return ::grpc::internal::BlockingUnaryCall< ::dejavu_ft::StartUpInfoRequest, ::dejavu_ft::StartUpInfoResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_GetInfo_, context, request, response);
 }
 
-void Controller::Stub::experimental_async::GetInfo(::grpc::ClientContext* context, const ::dejavu_ft::StartUpInfoRequest* request, ::dejavu_ft::StartUpInfoResponse* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_GetInfo_, context, request, response, std::move(f));
+void Controller::Stub::async::GetInfo(::grpc::ClientContext* context, const ::dejavu_ft::StartUpInfoRequest* request, ::dejavu_ft::StartUpInfoResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::dejavu_ft::StartUpInfoRequest, ::dejavu_ft::StartUpInfoResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_GetInfo_, context, request, response, std::move(f));
 }
 
-::grpc::ClientAsyncResponseReader< ::dejavu_ft::StartUpInfoResponse>* Controller::Stub::AsyncGetInfoRaw(::grpc::ClientContext* context, const ::dejavu_ft::StartUpInfoRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu_ft::StartUpInfoResponse>::Create(channel_.get(), cq, rpcmethod_GetInfo_, context, request, true);
+void Controller::Stub::async::GetInfo(::grpc::ClientContext* context, const ::dejavu_ft::StartUpInfoRequest* request, ::dejavu_ft::StartUpInfoResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_GetInfo_, context, request, response, reactor);
 }
 
 ::grpc::ClientAsyncResponseReader< ::dejavu_ft::StartUpInfoResponse>* Controller::Stub::PrepareAsyncGetInfoRaw(::grpc::ClientContext* context, const ::dejavu_ft::StartUpInfoRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu_ft::StartUpInfoResponse>::Create(channel_.get(), cq, rpcmethod_GetInfo_, context, request, false);
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::dejavu_ft::StartUpInfoResponse, ::dejavu_ft::StartUpInfoRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_GetInfo_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::dejavu_ft::StartUpInfoResponse>* Controller::Stub::AsyncGetInfoRaw(::grpc::ClientContext* context, const ::dejavu_ft::StartUpInfoRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncGetInfoRaw(context, request, cq);
+  result->StartCall();
+  return result;
 }
 
 ::grpc::Status Controller::Stub::Reset(::grpc::ClientContext* context, const ::dejavu_ft::ResetRequest& request, ::dejavu_ft::ResetResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_Reset_, context, request, response);
+  return ::grpc::internal::BlockingUnaryCall< ::dejavu_ft::ResetRequest, ::dejavu_ft::ResetResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_Reset_, context, request, response);
 }
 
-void Controller::Stub::experimental_async::Reset(::grpc::ClientContext* context, const ::dejavu_ft::ResetRequest* request, ::dejavu_ft::ResetResponse* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_Reset_, context, request, response, std::move(f));
+void Controller::Stub::async::Reset(::grpc::ClientContext* context, const ::dejavu_ft::ResetRequest* request, ::dejavu_ft::ResetResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::dejavu_ft::ResetRequest, ::dejavu_ft::ResetResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Reset_, context, request, response, std::move(f));
 }
 
-::grpc::ClientAsyncResponseReader< ::dejavu_ft::ResetResponse>* Controller::Stub::AsyncResetRaw(::grpc::ClientContext* context, const ::dejavu_ft::ResetRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu_ft::ResetResponse>::Create(channel_.get(), cq, rpcmethod_Reset_, context, request, true);
+void Controller::Stub::async::Reset(::grpc::ClientContext* context, const ::dejavu_ft::ResetRequest* request, ::dejavu_ft::ResetResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Reset_, context, request, response, reactor);
 }
 
 ::grpc::ClientAsyncResponseReader< ::dejavu_ft::ResetResponse>* Controller::Stub::PrepareAsyncResetRaw(::grpc::ClientContext* context, const ::dejavu_ft::ResetRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu_ft::ResetResponse>::Create(channel_.get(), cq, rpcmethod_Reset_, context, request, false);
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::dejavu_ft::ResetResponse, ::dejavu_ft::ResetRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_Reset_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::dejavu_ft::ResetResponse>* Controller::Stub::AsyncResetRaw(::grpc::ClientContext* context, const ::dejavu_ft::ResetRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncResetRaw(context, request, cq);
+  result->StartCall();
+  return result;
 }
 
 ::grpc::Status Controller::Stub::MarkUbatchFinished(::grpc::ClientContext* context, const ::dejavu_ft::UbatchFinishedRequest& request, ::dejavu_ft::UbatchFinishedResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_MarkUbatchFinished_, context, request, response);
+  return ::grpc::internal::BlockingUnaryCall< ::dejavu_ft::UbatchFinishedRequest, ::dejavu_ft::UbatchFinishedResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_MarkUbatchFinished_, context, request, response);
 }
 
-void Controller::Stub::experimental_async::MarkUbatchFinished(::grpc::ClientContext* context, const ::dejavu_ft::UbatchFinishedRequest* request, ::dejavu_ft::UbatchFinishedResponse* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_MarkUbatchFinished_, context, request, response, std::move(f));
+void Controller::Stub::async::MarkUbatchFinished(::grpc::ClientContext* context, const ::dejavu_ft::UbatchFinishedRequest* request, ::dejavu_ft::UbatchFinishedResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::dejavu_ft::UbatchFinishedRequest, ::dejavu_ft::UbatchFinishedResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_MarkUbatchFinished_, context, request, response, std::move(f));
 }
 
-::grpc::ClientAsyncResponseReader< ::dejavu_ft::UbatchFinishedResponse>* Controller::Stub::AsyncMarkUbatchFinishedRaw(::grpc::ClientContext* context, const ::dejavu_ft::UbatchFinishedRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu_ft::UbatchFinishedResponse>::Create(channel_.get(), cq, rpcmethod_MarkUbatchFinished_, context, request, true);
+void Controller::Stub::async::MarkUbatchFinished(::grpc::ClientContext* context, const ::dejavu_ft::UbatchFinishedRequest* request, ::dejavu_ft::UbatchFinishedResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_MarkUbatchFinished_, context, request, response, reactor);
 }
 
 ::grpc::ClientAsyncResponseReader< ::dejavu_ft::UbatchFinishedResponse>* Controller::Stub::PrepareAsyncMarkUbatchFinishedRaw(::grpc::ClientContext* context, const ::dejavu_ft::UbatchFinishedRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu_ft::UbatchFinishedResponse>::Create(channel_.get(), cq, rpcmethod_MarkUbatchFinished_, context, request, false);
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::dejavu_ft::UbatchFinishedResponse, ::dejavu_ft::UbatchFinishedRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_MarkUbatchFinished_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::dejavu_ft::UbatchFinishedResponse>* Controller::Stub::AsyncMarkUbatchFinishedRaw(::grpc::ClientContext* context, const ::dejavu_ft::UbatchFinishedRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncMarkUbatchFinishedRaw(context, request, cq);
+  result->StartCall();
+  return result;
 }
 
 ::grpc::Status Controller::Stub::IsReady(::grpc::ClientContext* context, const ::dejavu_ft::IsReadyRequest& request, ::dejavu_ft::IsReadyResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_IsReady_, context, request, response);
+  return ::grpc::internal::BlockingUnaryCall< ::dejavu_ft::IsReadyRequest, ::dejavu_ft::IsReadyResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_IsReady_, context, request, response);
 }
 
-void Controller::Stub::experimental_async::IsReady(::grpc::ClientContext* context, const ::dejavu_ft::IsReadyRequest* request, ::dejavu_ft::IsReadyResponse* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_IsReady_, context, request, response, std::move(f));
+void Controller::Stub::async::IsReady(::grpc::ClientContext* context, const ::dejavu_ft::IsReadyRequest* request, ::dejavu_ft::IsReadyResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::dejavu_ft::IsReadyRequest, ::dejavu_ft::IsReadyResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_IsReady_, context, request, response, std::move(f));
 }
 
-::grpc::ClientAsyncResponseReader< ::dejavu_ft::IsReadyResponse>* Controller::Stub::AsyncIsReadyRaw(::grpc::ClientContext* context, const ::dejavu_ft::IsReadyRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu_ft::IsReadyResponse>::Create(channel_.get(), cq, rpcmethod_IsReady_, context, request, true);
+void Controller::Stub::async::IsReady(::grpc::ClientContext* context, const ::dejavu_ft::IsReadyRequest* request, ::dejavu_ft::IsReadyResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_IsReady_, context, request, response, reactor);
 }
 
 ::grpc::ClientAsyncResponseReader< ::dejavu_ft::IsReadyResponse>* Controller::Stub::PrepareAsyncIsReadyRaw(::grpc::ClientContext* context, const ::dejavu_ft::IsReadyRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu_ft::IsReadyResponse>::Create(channel_.get(), cq, rpcmethod_IsReady_, context, request, false);
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::dejavu_ft::IsReadyResponse, ::dejavu_ft::IsReadyRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_IsReady_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::dejavu_ft::IsReadyResponse>* Controller::Stub::AsyncIsReadyRaw(::grpc::ClientContext* context, const ::dejavu_ft::IsReadyRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncIsReadyRaw(context, request, cq);
+  result->StartCall();
+  return result;
 }
 
 ::grpc::Status Controller::Stub::MarkRestart(::grpc::ClientContext* context, const ::dejavu_ft::IsRestartRequest& request, ::dejavu_ft::IsRestartResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_MarkRestart_, context, request, response);
+  return ::grpc::internal::BlockingUnaryCall< ::dejavu_ft::IsRestartRequest, ::dejavu_ft::IsRestartResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_MarkRestart_, context, request, response);
 }
 
-void Controller::Stub::experimental_async::MarkRestart(::grpc::ClientContext* context, const ::dejavu_ft::IsRestartRequest* request, ::dejavu_ft::IsRestartResponse* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_MarkRestart_, context, request, response, std::move(f));
+void Controller::Stub::async::MarkRestart(::grpc::ClientContext* context, const ::dejavu_ft::IsRestartRequest* request, ::dejavu_ft::IsRestartResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::dejavu_ft::IsRestartRequest, ::dejavu_ft::IsRestartResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_MarkRestart_, context, request, response, std::move(f));
 }
 
-::grpc::ClientAsyncResponseReader< ::dejavu_ft::IsRestartResponse>* Controller::Stub::AsyncMarkRestartRaw(::grpc::ClientContext* context, const ::dejavu_ft::IsRestartRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu_ft::IsRestartResponse>::Create(channel_.get(), cq, rpcmethod_MarkRestart_, context, request, true);
+void Controller::Stub::async::MarkRestart(::grpc::ClientContext* context, const ::dejavu_ft::IsRestartRequest* request, ::dejavu_ft::IsRestartResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_MarkRestart_, context, request, response, reactor);
 }
 
 ::grpc::ClientAsyncResponseReader< ::dejavu_ft::IsRestartResponse>* Controller::Stub::PrepareAsyncMarkRestartRaw(::grpc::ClientContext* context, const ::dejavu_ft::IsRestartRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu_ft::IsRestartResponse>::Create(channel_.get(), cq, rpcmethod_MarkRestart_, context, request, false);
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::dejavu_ft::IsRestartResponse, ::dejavu_ft::IsRestartRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_MarkRestart_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::dejavu_ft::IsRestartResponse>* Controller::Stub::AsyncMarkRestartRaw(::grpc::ClientContext* context, const ::dejavu_ft::IsRestartRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncMarkRestartRaw(context, request, cq);
+  result->StartCall();
+  return result;
 }
 
 Controller::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Controller_method_names[0],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< Controller::Service, ::dejavu_ft::HeartBeatRequest, ::dejavu_ft::HeartBeatResponse>(
-          std::mem_fn(&Controller::Service::SendHeartbeat), this)));
+      new ::grpc::internal::RpcMethodHandler< Controller::Service, ::dejavu_ft::HeartBeatRequest, ::dejavu_ft::HeartBeatResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](Controller::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::dejavu_ft::HeartBeatRequest* req,
+             ::dejavu_ft::HeartBeatResponse* resp) {
+               return service->SendHeartbeat(ctx, req, resp);
+             }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Controller_method_names[1],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< Controller::Service, ::dejavu_ft::CacheRequest, ::dejavu_ft::CacheResponse>(
-          std::mem_fn(&Controller::Service::SendCacheAck), this)));
+      new ::grpc::internal::RpcMethodHandler< Controller::Service, ::dejavu_ft::CacheRequest, ::dejavu_ft::CacheResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](Controller::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::dejavu_ft::CacheRequest* req,
+             ::dejavu_ft::CacheResponse* resp) {
+               return service->SendCacheAck(ctx, req, resp);
+             }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Controller_method_names[2],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< Controller::Service, ::dejavu_ft::TokenRequest, ::dejavu_ft::TokenResponse>(
-          std::mem_fn(&Controller::Service::SendToken), this)));
+      new ::grpc::internal::RpcMethodHandler< Controller::Service, ::dejavu_ft::TokenRequest, ::dejavu_ft::TokenResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](Controller::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::dejavu_ft::TokenRequest* req,
+             ::dejavu_ft::TokenResponse* resp) {
+               return service->SendToken(ctx, req, resp);
+             }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Controller_method_names[3],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< Controller::Service, ::dejavu_ft::StartUpInfoRequest, ::dejavu_ft::StartUpInfoResponse>(
-          std::mem_fn(&Controller::Service::GetInfo), this)));
+      new ::grpc::internal::RpcMethodHandler< Controller::Service, ::dejavu_ft::StartUpInfoRequest, ::dejavu_ft::StartUpInfoResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](Controller::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::dejavu_ft::StartUpInfoRequest* req,
+             ::dejavu_ft::StartUpInfoResponse* resp) {
+               return service->GetInfo(ctx, req, resp);
+             }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Controller_method_names[4],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< Controller::Service, ::dejavu_ft::ResetRequest, ::dejavu_ft::ResetResponse>(
-          std::mem_fn(&Controller::Service::Reset), this)));
+      new ::grpc::internal::RpcMethodHandler< Controller::Service, ::dejavu_ft::ResetRequest, ::dejavu_ft::ResetResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](Controller::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::dejavu_ft::ResetRequest* req,
+             ::dejavu_ft::ResetResponse* resp) {
+               return service->Reset(ctx, req, resp);
+             }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Controller_method_names[5],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< Controller::Service, ::dejavu_ft::UbatchFinishedRequest, ::dejavu_ft::UbatchFinishedResponse>(
-          std::mem_fn(&Controller::Service::MarkUbatchFinished), this)));
+      new ::grpc::internal::RpcMethodHandler< Controller::Service, ::dejavu_ft::UbatchFinishedRequest, ::dejavu_ft::UbatchFinishedResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](Controller::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::dejavu_ft::UbatchFinishedRequest* req,
+             ::dejavu_ft::UbatchFinishedResponse* resp) {
+               return service->MarkUbatchFinished(ctx, req, resp);
+             }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Controller_method_names[6],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< Controller::Service, ::dejavu_ft::IsReadyRequest, ::dejavu_ft::IsReadyResponse>(
-          std::mem_fn(&Controller::Service::IsReady), this)));
+      new ::grpc::internal::RpcMethodHandler< Controller::Service, ::dejavu_ft::IsReadyRequest, ::dejavu_ft::IsReadyResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](Controller::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::dejavu_ft::IsReadyRequest* req,
+             ::dejavu_ft::IsReadyResponse* resp) {
+               return service->IsReady(ctx, req, resp);
+             }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       Controller_method_names[7],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< Controller::Service, ::dejavu_ft::IsRestartRequest, ::dejavu_ft::IsRestartResponse>(
-          std::mem_fn(&Controller::Service::MarkRestart), this)));
+      new ::grpc::internal::RpcMethodHandler< Controller::Service, ::dejavu_ft::IsRestartRequest, ::dejavu_ft::IsRestartResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](Controller::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::dejavu_ft::IsRestartRequest* req,
+             ::dejavu_ft::IsRestartResponse* resp) {
+               return service->MarkRestart(ctx, req, resp);
+             }, this)));
 }
 
 Controller::Service::~Service() {

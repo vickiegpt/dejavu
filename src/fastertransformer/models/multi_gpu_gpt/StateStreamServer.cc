@@ -55,7 +55,7 @@ void RunServer(DejaVuManagerImpl& service, int port, int num_microbatches, int p
     for (int i = 0; i < service.prompt_buffer_size_; i++)
         service.avail_queue_.push(i);
     service.avail_mtx_.unlock();
-    printf("QUEUE SIZE %d\n", service.avail_queue_.size());
+    printf("QUEUE SIZE %zu\n", static_cast<size_t>(service.avail_queue_.size()));
 
     ServerBuilder builder;
     builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());

@@ -22,4 +22,3 @@ set(parallel_gpt_triton_backend_files
 add_library(GptJTritonBackend STATIC ${parallel_gpt_triton_backend_files})
 set_property(TARGET GptJTritonBackend PROPERTY POSITION_INDEPENDENT_CODE  ON)
 target_link_libraries(GptJTritonBackend PRIVATE TransformerTritonBackend GptJ -lcublasLt)
-target_compile_features(GptJTritonBackend PRIVATE cxx_std_14)

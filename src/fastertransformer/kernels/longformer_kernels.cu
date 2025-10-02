@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 #include <cmath>
+#include <cfloat>
 
 #ifndef CUDART_VERSION
 #error CUDART_VERSION Undefined!

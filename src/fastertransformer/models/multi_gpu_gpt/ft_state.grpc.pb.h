@@ -7,23 +7,23 @@
 #include "ft_state.pb.h"
 
 #include <functional>
-#include <grpcpp/impl/codegen/async_generic_service.h>
-#include <grpcpp/impl/codegen/async_stream.h>
-#include <grpcpp/impl/codegen/async_unary_call.h>
-#include <grpcpp/impl/codegen/method_handler_impl.h>
+#include <grpcpp/generic/async_generic_service.h>
+#include <grpcpp/support/async_stream.h>
+#include <grpcpp/support/async_unary_call.h>
+#include <grpcpp/support/client_callback.h>
+#include <grpcpp/client_context.h>
+#include <grpcpp/completion_queue.h>
+#include <grpcpp/support/message_allocator.h>
+#include <grpcpp/support/method_handler.h>
 #include <grpcpp/impl/codegen/proto_utils.h>
-#include <grpcpp/impl/codegen/rpc_method.h>
-#include <grpcpp/impl/codegen/service_type.h>
+#include <grpcpp/impl/rpc_method.h>
+#include <grpcpp/support/server_callback.h>
+#include <grpcpp/impl/codegen/server_callback_handlers.h>
+#include <grpcpp/server_context.h>
+#include <grpcpp/impl/service_type.h>
 #include <grpcpp/impl/codegen/status.h>
-#include <grpcpp/impl/codegen/stub_options.h>
-#include <grpcpp/impl/codegen/sync_stream.h>
-
-namespace grpc {
-class CompletionQueue;
-class Channel;
-class ServerCompletionQueue;
-class ServerContext;
-}  // namespace grpc
+#include <grpcpp/support/stub_options.h>
+#include <grpcpp/support/sync_stream.h>
 
 namespace dejavu_ft {
 
@@ -91,20 +91,30 @@ class Controller final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::dejavu_ft::IsRestartResponse>> PrepareAsyncMarkRestart(::grpc::ClientContext* context, const ::dejavu_ft::IsRestartRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReaderInterface< ::dejavu_ft::IsRestartResponse>>(PrepareAsyncMarkRestartRaw(context, request, cq));
     }
-    class experimental_async_interface {
+    class async_interface {
      public:
-      virtual ~experimental_async_interface() {}
+      virtual ~async_interface() {}
       virtual void SendHeartbeat(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest* request, ::dejavu_ft::HeartBeatResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void SendHeartbeat(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest* request, ::dejavu_ft::HeartBeatResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void SendCacheAck(::grpc::ClientContext* context, const ::dejavu_ft::CacheRequest* request, ::dejavu_ft::CacheResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void SendCacheAck(::grpc::ClientContext* context, const ::dejavu_ft::CacheRequest* request, ::dejavu_ft::CacheResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void SendToken(::grpc::ClientContext* context, const ::dejavu_ft::TokenRequest* request, ::dejavu_ft::TokenResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void SendToken(::grpc::ClientContext* context, const ::dejavu_ft::TokenRequest* request, ::dejavu_ft::TokenResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void GetInfo(::grpc::ClientContext* context, const ::dejavu_ft::StartUpInfoRequest* request, ::dejavu_ft::StartUpInfoResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void GetInfo(::grpc::ClientContext* context, const ::dejavu_ft::StartUpInfoRequest* request, ::dejavu_ft::StartUpInfoResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void Reset(::grpc::ClientContext* context, const ::dejavu_ft::ResetRequest* request, ::dejavu_ft::ResetResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void Reset(::grpc::ClientContext* context, const ::dejavu_ft::ResetRequest* request, ::dejavu_ft::ResetResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void MarkUbatchFinished(::grpc::ClientContext* context, const ::dejavu_ft::UbatchFinishedRequest* request, ::dejavu_ft::UbatchFinishedResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void MarkUbatchFinished(::grpc::ClientContext* context, const ::dejavu_ft::UbatchFinishedRequest* request, ::dejavu_ft::UbatchFinishedResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void IsReady(::grpc::ClientContext* context, const ::dejavu_ft::IsReadyRequest* request, ::dejavu_ft::IsReadyResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void IsReady(::grpc::ClientContext* context, const ::dejavu_ft::IsReadyRequest* request, ::dejavu_ft::IsReadyResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
       virtual void MarkRestart(::grpc::ClientContext* context, const ::dejavu_ft::IsRestartRequest* request, ::dejavu_ft::IsRestartResponse* response, std::function<void(::grpc::Status)>) = 0;
+      virtual void MarkRestart(::grpc::ClientContext* context, const ::dejavu_ft::IsRestartRequest* request, ::dejavu_ft::IsRestartResponse* response, ::grpc::ClientUnaryReactor* reactor) = 0;
     };
-    virtual class experimental_async_interface* experimental_async() { return nullptr; }
-  private:
+    typedef class async_interface experimental_async_interface;
+    virtual class async_interface* async() { return nullptr; }
+    class async_interface* experimental_async() { return async(); }
+   private:
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::dejavu_ft::HeartBeatResponse>* AsyncSendHeartbeatRaw(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::dejavu_ft::HeartBeatResponse>* PrepareAsyncSendHeartbeatRaw(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest& request, ::grpc::CompletionQueue* cq) = 0;
     virtual ::grpc::ClientAsyncResponseReaderInterface< ::dejavu_ft::CacheResponse>* AsyncSendCacheAckRaw(::grpc::ClientContext* context, const ::dejavu_ft::CacheRequest& request, ::grpc::CompletionQueue* cq) = 0;
@@ -124,7 +134,7 @@ class Controller final {
   };
   class Stub final : public StubInterface {
    public:
-    Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel);
+    Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options = ::grpc::StubOptions());
     ::grpc::Status SendHeartbeat(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest& request, ::dejavu_ft::HeartBeatResponse* response) override;
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dejavu_ft::HeartBeatResponse>> AsyncSendHeartbeat(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dejavu_ft::HeartBeatResponse>>(AsyncSendHeartbeatRaw(context, request, cq));
@@ -181,28 +191,36 @@ class Controller final {
     std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dejavu_ft::IsRestartResponse>> PrepareAsyncMarkRestart(::grpc::ClientContext* context, const ::dejavu_ft::IsRestartRequest& request, ::grpc::CompletionQueue* cq) {
       return std::unique_ptr< ::grpc::ClientAsyncResponseReader< ::dejavu_ft::IsRestartResponse>>(PrepareAsyncMarkRestartRaw(context, request, cq));
     }
-    class experimental_async final :
-      public StubInterface::experimental_async_interface {
+    class async final :
+      public StubInterface::async_interface {
      public:
       void SendHeartbeat(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest* request, ::dejavu_ft::HeartBeatResponse* response, std::function<void(::grpc::Status)>) override;
+      void SendHeartbeat(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest* request, ::dejavu_ft::HeartBeatResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
       void SendCacheAck(::grpc::ClientContext* context, const ::dejavu_ft::CacheRequest* request, ::dejavu_ft::CacheResponse* response, std::function<void(::grpc::Status)>) override;
+      void SendCacheAck(::grpc::ClientContext* context, const ::dejavu_ft::CacheRequest* request, ::dejavu_ft::CacheResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
       void SendToken(::grpc::ClientContext* context, const ::dejavu_ft::TokenRequest* request, ::dejavu_ft::TokenResponse* response, std::function<void(::grpc::Status)>) override;
+      void SendToken(::grpc::ClientContext* context, const ::dejavu_ft::TokenRequest* request, ::dejavu_ft::TokenResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
       void GetInfo(::grpc::ClientContext* context, const ::dejavu_ft::StartUpInfoRequest* request, ::dejavu_ft::StartUpInfoResponse* response, std::function<void(::grpc::Status)>) override;
+      void GetInfo(::grpc::ClientContext* context, const ::dejavu_ft::StartUpInfoRequest* request, ::dejavu_ft::StartUpInfoResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
       void Reset(::grpc::ClientContext* context, const ::dejavu_ft::ResetRequest* request, ::dejavu_ft::ResetResponse* response, std::function<void(::grpc::Status)>) override;
+      void Reset(::grpc::ClientContext* context, const ::dejavu_ft::ResetRequest* request, ::dejavu_ft::ResetResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
       void MarkUbatchFinished(::grpc::ClientContext* context, const ::dejavu_ft::UbatchFinishedRequest* request, ::dejavu_ft::UbatchFinishedResponse* response, std::function<void(::grpc::Status)>) override;
+      void MarkUbatchFinished(::grpc::ClientContext* context, const ::dejavu_ft::UbatchFinishedRequest* request, ::dejavu_ft::UbatchFinishedResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
       void IsReady(::grpc::ClientContext* context, const ::dejavu_ft::IsReadyRequest* request, ::dejavu_ft::IsReadyResponse* response, std::function<void(::grpc::Status)>) override;
+      void IsReady(::grpc::ClientContext* context, const ::dejavu_ft::IsReadyRequest* request, ::dejavu_ft::IsReadyResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
       void MarkRestart(::grpc::ClientContext* context, const ::dejavu_ft::IsRestartRequest* request, ::dejavu_ft::IsRestartResponse* response, std::function<void(::grpc::Status)>) override;
+      void MarkRestart(::grpc::ClientContext* context, const ::dejavu_ft::IsRestartRequest* request, ::dejavu_ft::IsRestartResponse* response, ::grpc::ClientUnaryReactor* reactor) override;
      private:
       friend class Stub;
-      explicit experimental_async(Stub* stub): stub_(stub) { }
+      explicit async(Stub* stub): stub_(stub) { }
       Stub* stub() { return stub_; }
       Stub* stub_;
     };
-    class experimental_async_interface* experimental_async() override { return &async_stub_; }
+    class async* async() override { return &async_stub_; }
 
    private:
     std::shared_ptr< ::grpc::ChannelInterface> channel_;
-    class experimental_async async_stub_{this};
+    class async async_stub_{this};
     ::grpc::ClientAsyncResponseReader< ::dejavu_ft::HeartBeatResponse>* AsyncSendHeartbeatRaw(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::dejavu_ft::HeartBeatResponse>* PrepareAsyncSendHeartbeatRaw(::grpc::ClientContext* context, const ::dejavu_ft::HeartBeatRequest& request, ::grpc::CompletionQueue* cq) override;
     ::grpc::ClientAsyncResponseReader< ::dejavu_ft::CacheResponse>* AsyncSendCacheAckRaw(::grpc::ClientContext* context, const ::dejavu_ft::CacheRequest& request, ::grpc::CompletionQueue* cq) override;
@@ -246,7 +264,7 @@ class Controller final {
   template <class BaseClass>
   class WithAsyncMethod_SendHeartbeat : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_SendHeartbeat() {
       ::grpc::Service::MarkMethodAsync(0);
@@ -255,7 +273,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SendHeartbeat(::grpc::ServerContext* context, const ::dejavu_ft::HeartBeatRequest* request, ::dejavu_ft::HeartBeatResponse* response) override {
+    ::grpc::Status SendHeartbeat(::grpc::ServerContext* /*context*/, const ::dejavu_ft::HeartBeatRequest* /*request*/, ::dejavu_ft::HeartBeatResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -266,7 +284,7 @@ class Controller final {
   template <class BaseClass>
   class WithAsyncMethod_SendCacheAck : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_SendCacheAck() {
       ::grpc::Service::MarkMethodAsync(1);
@@ -275,7 +293,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SendCacheAck(::grpc::ServerContext* context, const ::dejavu_ft::CacheRequest* request, ::dejavu_ft::CacheResponse* response) override {
+    ::grpc::Status SendCacheAck(::grpc::ServerContext* /*context*/, const ::dejavu_ft::CacheRequest* /*request*/, ::dejavu_ft::CacheResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -286,7 +304,7 @@ class Controller final {
   template <class BaseClass>
   class WithAsyncMethod_SendToken : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_SendToken() {
       ::grpc::Service::MarkMethodAsync(2);
@@ -295,7 +313,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SendToken(::grpc::ServerContext* context, const ::dejavu_ft::TokenRequest* request, ::dejavu_ft::TokenResponse* response) override {
+    ::grpc::Status SendToken(::grpc::ServerContext* /*context*/, const ::dejavu_ft::TokenRequest* /*request*/, ::dejavu_ft::TokenResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -306,7 +324,7 @@ class Controller final {
   template <class BaseClass>
   class WithAsyncMethod_GetInfo : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_GetInfo() {
       ::grpc::Service::MarkMethodAsync(3);
@@ -315,7 +333,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status GetInfo(::grpc::ServerContext* context, const ::dejavu_ft::StartUpInfoRequest* request, ::dejavu_ft::StartUpInfoResponse* response) override {
+    ::grpc::Status GetInfo(::grpc::ServerContext* /*context*/, const ::dejavu_ft::StartUpInfoRequest* /*request*/, ::dejavu_ft::StartUpInfoResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -326,7 +344,7 @@ class Controller final {
   template <class BaseClass>
   class WithAsyncMethod_Reset : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_Reset() {
       ::grpc::Service::MarkMethodAsync(4);
@@ -335,7 +353,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Reset(::grpc::ServerContext* context, const ::dejavu_ft::ResetRequest* request, ::dejavu_ft::ResetResponse* response) override {
+    ::grpc::Status Reset(::grpc::ServerContext* /*context*/, const ::dejavu_ft::ResetRequest* /*request*/, ::dejavu_ft::ResetResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -346,7 +364,7 @@ class Controller final {
   template <class BaseClass>
   class WithAsyncMethod_MarkUbatchFinished : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_MarkUbatchFinished() {
       ::grpc::Service::MarkMethodAsync(5);
@@ -355,7 +373,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MarkUbatchFinished(::grpc::ServerContext* context, const ::dejavu_ft::UbatchFinishedRequest* request, ::dejavu_ft::UbatchFinishedResponse* response) override {
+    ::grpc::Status MarkUbatchFinished(::grpc::ServerContext* /*context*/, const ::dejavu_ft::UbatchFinishedRequest* /*request*/, ::dejavu_ft::UbatchFinishedResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -366,7 +384,7 @@ class Controller final {
   template <class BaseClass>
   class WithAsyncMethod_IsReady : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_IsReady() {
       ::grpc::Service::MarkMethodAsync(6);
@@ -375,7 +393,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status IsReady(::grpc::ServerContext* context, const ::dejavu_ft::IsReadyRequest* request, ::dejavu_ft::IsReadyResponse* response) override {
+    ::grpc::Status IsReady(::grpc::ServerContext* /*context*/, const ::dejavu_ft::IsReadyRequest* /*request*/, ::dejavu_ft::IsReadyResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -386,7 +404,7 @@ class Controller final {
   template <class BaseClass>
   class WithAsyncMethod_MarkRestart : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithAsyncMethod_MarkRestart() {
       ::grpc::Service::MarkMethodAsync(7);
@@ -395,7 +413,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MarkRestart(::grpc::ServerContext* context, const ::dejavu_ft::IsRestartRequest* request, ::dejavu_ft::IsRestartResponse* response) override {
+    ::grpc::Status MarkRestart(::grpc::ServerContext* /*context*/, const ::dejavu_ft::IsRestartRequest* /*request*/, ::dejavu_ft::IsRestartResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -405,9 +423,227 @@ class Controller final {
   };
   typedef WithAsyncMethod_SendHeartbeat<WithAsyncMethod_SendCacheAck<WithAsyncMethod_SendToken<WithAsyncMethod_GetInfo<WithAsyncMethod_Reset<WithAsyncMethod_MarkUbatchFinished<WithAsyncMethod_IsReady<WithAsyncMethod_MarkRestart<Service > > > > > > > > AsyncService;
   template <class BaseClass>
+  class WithCallbackMethod_SendHeartbeat : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_SendHeartbeat() {
+      ::grpc::Service::MarkMethodCallback(0,
+          new ::grpc::internal::CallbackUnaryHandler< ::dejavu_ft::HeartBeatRequest, ::dejavu_ft::HeartBeatResponse>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::dejavu_ft::HeartBeatRequest* request, ::dejavu_ft::HeartBeatResponse* response) { return this->SendHeartbeat(context, request, response); }));}
+    void SetMessageAllocatorFor_SendHeartbeat(
+        ::grpc::MessageAllocator< ::dejavu_ft::HeartBeatRequest, ::dejavu_ft::HeartBeatResponse>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(0);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::dejavu_ft::HeartBeatRequest, ::dejavu_ft::HeartBeatResponse>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_SendHeartbeat() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status SendHeartbeat(::grpc::ServerContext* /*context*/, const ::dejavu_ft::HeartBeatRequest* /*request*/, ::dejavu_ft::HeartBeatResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* SendHeartbeat(
+      ::grpc::CallbackServerContext* /*context*/, const ::dejavu_ft::HeartBeatRequest* /*request*/, ::dejavu_ft::HeartBeatResponse* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_SendCacheAck : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_SendCacheAck() {
+      ::grpc::Service::MarkMethodCallback(1,
+          new ::grpc::internal::CallbackUnaryHandler< ::dejavu_ft::CacheRequest, ::dejavu_ft::CacheResponse>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::dejavu_ft::CacheRequest* request, ::dejavu_ft::CacheResponse* response) { return this->SendCacheAck(context, request, response); }));}
+    void SetMessageAllocatorFor_SendCacheAck(
+        ::grpc::MessageAllocator< ::dejavu_ft::CacheRequest, ::dejavu_ft::CacheResponse>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(1);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::dejavu_ft::CacheRequest, ::dejavu_ft::CacheResponse>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_SendCacheAck() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status SendCacheAck(::grpc::ServerContext* /*context*/, const ::dejavu_ft::CacheRequest* /*request*/, ::dejavu_ft::CacheResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* SendCacheAck(
+      ::grpc::CallbackServerContext* /*context*/, const ::dejavu_ft::CacheRequest* /*request*/, ::dejavu_ft::CacheResponse* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_SendToken : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_SendToken() {
+      ::grpc::Service::MarkMethodCallback(2,
+          new ::grpc::internal::CallbackUnaryHandler< ::dejavu_ft::TokenRequest, ::dejavu_ft::TokenResponse>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::dejavu_ft::TokenRequest* request, ::dejavu_ft::TokenResponse* response) { return this->SendToken(context, request, response); }));}
+    void SetMessageAllocatorFor_SendToken(
+        ::grpc::MessageAllocator< ::dejavu_ft::TokenRequest, ::dejavu_ft::TokenResponse>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(2);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::dejavu_ft::TokenRequest, ::dejavu_ft::TokenResponse>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_SendToken() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status SendToken(::grpc::ServerContext* /*context*/, const ::dejavu_ft::TokenRequest* /*request*/, ::dejavu_ft::TokenResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* SendToken(
+      ::grpc::CallbackServerContext* /*context*/, const ::dejavu_ft::TokenRequest* /*request*/, ::dejavu_ft::TokenResponse* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_GetInfo : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_GetInfo() {
+      ::grpc::Service::MarkMethodCallback(3,
+          new ::grpc::internal::CallbackUnaryHandler< ::dejavu_ft::StartUpInfoRequest, ::dejavu_ft::StartUpInfoResponse>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::dejavu_ft::StartUpInfoRequest* request, ::dejavu_ft::StartUpInfoResponse* response) { return this->GetInfo(context, request, response); }));}
+    void SetMessageAllocatorFor_GetInfo(
+        ::grpc::MessageAllocator< ::dejavu_ft::StartUpInfoRequest, ::dejavu_ft::StartUpInfoResponse>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(3);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::dejavu_ft::StartUpInfoRequest, ::dejavu_ft::StartUpInfoResponse>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_GetInfo() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetInfo(::grpc::ServerContext* /*context*/, const ::dejavu_ft::StartUpInfoRequest* /*request*/, ::dejavu_ft::StartUpInfoResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* GetInfo(
+      ::grpc::CallbackServerContext* /*context*/, const ::dejavu_ft::StartUpInfoRequest* /*request*/, ::dejavu_ft::StartUpInfoResponse* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_Reset : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_Reset() {
+      ::grpc::Service::MarkMethodCallback(4,
+          new ::grpc::internal::CallbackUnaryHandler< ::dejavu_ft::ResetRequest, ::dejavu_ft::ResetResponse>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::dejavu_ft::ResetRequest* request, ::dejavu_ft::ResetResponse* response) { return this->Reset(context, request, response); }));}
+    void SetMessageAllocatorFor_Reset(
+        ::grpc::MessageAllocator< ::dejavu_ft::ResetRequest, ::dejavu_ft::ResetResponse>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(4);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::dejavu_ft::ResetRequest, ::dejavu_ft::ResetResponse>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_Reset() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Reset(::grpc::ServerContext* /*context*/, const ::dejavu_ft::ResetRequest* /*request*/, ::dejavu_ft::ResetResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* Reset(
+      ::grpc::CallbackServerContext* /*context*/, const ::dejavu_ft::ResetRequest* /*request*/, ::dejavu_ft::ResetResponse* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_MarkUbatchFinished : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_MarkUbatchFinished() {
+      ::grpc::Service::MarkMethodCallback(5,
+          new ::grpc::internal::CallbackUnaryHandler< ::dejavu_ft::UbatchFinishedRequest, ::dejavu_ft::UbatchFinishedResponse>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::dejavu_ft::UbatchFinishedRequest* request, ::dejavu_ft::UbatchFinishedResponse* response) { return this->MarkUbatchFinished(context, request, response); }));}
+    void SetMessageAllocatorFor_MarkUbatchFinished(
+        ::grpc::MessageAllocator< ::dejavu_ft::UbatchFinishedRequest, ::dejavu_ft::UbatchFinishedResponse>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(5);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::dejavu_ft::UbatchFinishedRequest, ::dejavu_ft::UbatchFinishedResponse>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_MarkUbatchFinished() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status MarkUbatchFinished(::grpc::ServerContext* /*context*/, const ::dejavu_ft::UbatchFinishedRequest* /*request*/, ::dejavu_ft::UbatchFinishedResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* MarkUbatchFinished(
+      ::grpc::CallbackServerContext* /*context*/, const ::dejavu_ft::UbatchFinishedRequest* /*request*/, ::dejavu_ft::UbatchFinishedResponse* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_IsReady : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_IsReady() {
+      ::grpc::Service::MarkMethodCallback(6,
+          new ::grpc::internal::CallbackUnaryHandler< ::dejavu_ft::IsReadyRequest, ::dejavu_ft::IsReadyResponse>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::dejavu_ft::IsReadyRequest* request, ::dejavu_ft::IsReadyResponse* response) { return this->IsReady(context, request, response); }));}
+    void SetMessageAllocatorFor_IsReady(
+        ::grpc::MessageAllocator< ::dejavu_ft::IsReadyRequest, ::dejavu_ft::IsReadyResponse>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(6);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::dejavu_ft::IsReadyRequest, ::dejavu_ft::IsReadyResponse>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_IsReady() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status IsReady(::grpc::ServerContext* /*context*/, const ::dejavu_ft::IsReadyRequest* /*request*/, ::dejavu_ft::IsReadyResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* IsReady(
+      ::grpc::CallbackServerContext* /*context*/, const ::dejavu_ft::IsReadyRequest* /*request*/, ::dejavu_ft::IsReadyResponse* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithCallbackMethod_MarkRestart : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithCallbackMethod_MarkRestart() {
+      ::grpc::Service::MarkMethodCallback(7,
+          new ::grpc::internal::CallbackUnaryHandler< ::dejavu_ft::IsRestartRequest, ::dejavu_ft::IsRestartResponse>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::dejavu_ft::IsRestartRequest* request, ::dejavu_ft::IsRestartResponse* response) { return this->MarkRestart(context, request, response); }));}
+    void SetMessageAllocatorFor_MarkRestart(
+        ::grpc::MessageAllocator< ::dejavu_ft::IsRestartRequest, ::dejavu_ft::IsRestartResponse>* allocator) {
+      ::grpc::internal::MethodHandler* const handler = ::grpc::Service::GetHandler(7);
+      static_cast<::grpc::internal::CallbackUnaryHandler< ::dejavu_ft::IsRestartRequest, ::dejavu_ft::IsRestartResponse>*>(handler)
+              ->SetMessageAllocator(allocator);
+    }
+    ~WithCallbackMethod_MarkRestart() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status MarkRestart(::grpc::ServerContext* /*context*/, const ::dejavu_ft::IsRestartRequest* /*request*/, ::dejavu_ft::IsRestartResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* MarkRestart(
+      ::grpc::CallbackServerContext* /*context*/, const ::dejavu_ft::IsRestartRequest* /*request*/, ::dejavu_ft::IsRestartResponse* /*response*/)  { return nullptr; }
+  };
+  typedef WithCallbackMethod_SendHeartbeat<WithCallbackMethod_SendCacheAck<WithCallbackMethod_SendToken<WithCallbackMethod_GetInfo<WithCallbackMethod_Reset<WithCallbackMethod_MarkUbatchFinished<WithCallbackMethod_IsReady<WithCallbackMethod_MarkRestart<Service > > > > > > > > CallbackService;
+  typedef CallbackService ExperimentalCallbackService;
+  template <class BaseClass>
   class WithGenericMethod_SendHeartbeat : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_SendHeartbeat() {
       ::grpc::Service::MarkMethodGeneric(0);
@@ -416,7 +652,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SendHeartbeat(::grpc::ServerContext* context, const ::dejavu_ft::HeartBeatRequest* request, ::dejavu_ft::HeartBeatResponse* response) override {
+    ::grpc::Status SendHeartbeat(::grpc::ServerContext* /*context*/, const ::dejavu_ft::HeartBeatRequest* /*request*/, ::dejavu_ft::HeartBeatResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -424,7 +660,7 @@ class Controller final {
   template <class BaseClass>
   class WithGenericMethod_SendCacheAck : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_SendCacheAck() {
       ::grpc::Service::MarkMethodGeneric(1);
@@ -433,7 +669,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SendCacheAck(::grpc::ServerContext* context, const ::dejavu_ft::CacheRequest* request, ::dejavu_ft::CacheResponse* response) override {
+    ::grpc::Status SendCacheAck(::grpc::ServerContext* /*context*/, const ::dejavu_ft::CacheRequest* /*request*/, ::dejavu_ft::CacheResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -441,7 +677,7 @@ class Controller final {
   template <class BaseClass>
   class WithGenericMethod_SendToken : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_SendToken() {
       ::grpc::Service::MarkMethodGeneric(2);
@@ -450,7 +686,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SendToken(::grpc::ServerContext* context, const ::dejavu_ft::TokenRequest* request, ::dejavu_ft::TokenResponse* response) override {
+    ::grpc::Status SendToken(::grpc::ServerContext* /*context*/, const ::dejavu_ft::TokenRequest* /*request*/, ::dejavu_ft::TokenResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -458,7 +694,7 @@ class Controller final {
   template <class BaseClass>
   class WithGenericMethod_GetInfo : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_GetInfo() {
       ::grpc::Service::MarkMethodGeneric(3);
@@ -467,7 +703,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status GetInfo(::grpc::ServerContext* context, const ::dejavu_ft::StartUpInfoRequest* request, ::dejavu_ft::StartUpInfoResponse* response) override {
+    ::grpc::Status GetInfo(::grpc::ServerContext* /*context*/, const ::dejavu_ft::StartUpInfoRequest* /*request*/, ::dejavu_ft::StartUpInfoResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -475,7 +711,7 @@ class Controller final {
   template <class BaseClass>
   class WithGenericMethod_Reset : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_Reset() {
       ::grpc::Service::MarkMethodGeneric(4);
@@ -484,7 +720,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Reset(::grpc::ServerContext* context, const ::dejavu_ft::ResetRequest* request, ::dejavu_ft::ResetResponse* response) override {
+    ::grpc::Status Reset(::grpc::ServerContext* /*context*/, const ::dejavu_ft::ResetRequest* /*request*/, ::dejavu_ft::ResetResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -492,7 +728,7 @@ class Controller final {
   template <class BaseClass>
   class WithGenericMethod_MarkUbatchFinished : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_MarkUbatchFinished() {
       ::grpc::Service::MarkMethodGeneric(5);
@@ -501,7 +737,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MarkUbatchFinished(::grpc::ServerContext* context, const ::dejavu_ft::UbatchFinishedRequest* request, ::dejavu_ft::UbatchFinishedResponse* response) override {
+    ::grpc::Status MarkUbatchFinished(::grpc::ServerContext* /*context*/, const ::dejavu_ft::UbatchFinishedRequest* /*request*/, ::dejavu_ft::UbatchFinishedResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -509,7 +745,7 @@ class Controller final {
   template <class BaseClass>
   class WithGenericMethod_IsReady : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_IsReady() {
       ::grpc::Service::MarkMethodGeneric(6);
@@ -518,7 +754,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status IsReady(::grpc::ServerContext* context, const ::dejavu_ft::IsReadyRequest* request, ::dejavu_ft::IsReadyResponse* response) override {
+    ::grpc::Status IsReady(::grpc::ServerContext* /*context*/, const ::dejavu_ft::IsReadyRequest* /*request*/, ::dejavu_ft::IsReadyResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -526,7 +762,7 @@ class Controller final {
   template <class BaseClass>
   class WithGenericMethod_MarkRestart : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithGenericMethod_MarkRestart() {
       ::grpc::Service::MarkMethodGeneric(7);
@@ -535,7 +771,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MarkRestart(::grpc::ServerContext* context, const ::dejavu_ft::IsRestartRequest* request, ::dejavu_ft::IsRestartResponse* response) override {
+    ::grpc::Status MarkRestart(::grpc::ServerContext* /*context*/, const ::dejavu_ft::IsRestartRequest* /*request*/, ::dejavu_ft::IsRestartResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -543,7 +779,7 @@ class Controller final {
   template <class BaseClass>
   class WithRawMethod_SendHeartbeat : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_SendHeartbeat() {
       ::grpc::Service::MarkMethodRaw(0);
@@ -552,7 +788,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SendHeartbeat(::grpc::ServerContext* context, const ::dejavu_ft::HeartBeatRequest* request, ::dejavu_ft::HeartBeatResponse* response) override {
+    ::grpc::Status SendHeartbeat(::grpc::ServerContext* /*context*/, const ::dejavu_ft::HeartBeatRequest* /*request*/, ::dejavu_ft::HeartBeatResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -563,7 +799,7 @@ class Controller final {
   template <class BaseClass>
   class WithRawMethod_SendCacheAck : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_SendCacheAck() {
       ::grpc::Service::MarkMethodRaw(1);
@@ -572,7 +808,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SendCacheAck(::grpc::ServerContext* context, const ::dejavu_ft::CacheRequest* request, ::dejavu_ft::CacheResponse* response) override {
+    ::grpc::Status SendCacheAck(::grpc::ServerContext* /*context*/, const ::dejavu_ft::CacheRequest* /*request*/, ::dejavu_ft::CacheResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -583,7 +819,7 @@ class Controller final {
   template <class BaseClass>
   class WithRawMethod_SendToken : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_SendToken() {
       ::grpc::Service::MarkMethodRaw(2);
@@ -592,7 +828,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status SendToken(::grpc::ServerContext* context, const ::dejavu_ft::TokenRequest* request, ::dejavu_ft::TokenResponse* response) override {
+    ::grpc::Status SendToken(::grpc::ServerContext* /*context*/, const ::dejavu_ft::TokenRequest* /*request*/, ::dejavu_ft::TokenResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -603,7 +839,7 @@ class Controller final {
   template <class BaseClass>
   class WithRawMethod_GetInfo : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_GetInfo() {
       ::grpc::Service::MarkMethodRaw(3);
@@ -612,7 +848,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status GetInfo(::grpc::ServerContext* context, const ::dejavu_ft::StartUpInfoRequest* request, ::dejavu_ft::StartUpInfoResponse* response) override {
+    ::grpc::Status GetInfo(::grpc::ServerContext* /*context*/, const ::dejavu_ft::StartUpInfoRequest* /*request*/, ::dejavu_ft::StartUpInfoResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -623,7 +859,7 @@ class Controller final {
   template <class BaseClass>
   class WithRawMethod_Reset : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_Reset() {
       ::grpc::Service::MarkMethodRaw(4);
@@ -632,7 +868,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status Reset(::grpc::ServerContext* context, const ::dejavu_ft::ResetRequest* request, ::dejavu_ft::ResetResponse* response) override {
+    ::grpc::Status Reset(::grpc::ServerContext* /*context*/, const ::dejavu_ft::ResetRequest* /*request*/, ::dejavu_ft::ResetResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -643,7 +879,7 @@ class Controller final {
   template <class BaseClass>
   class WithRawMethod_MarkUbatchFinished : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_MarkUbatchFinished() {
       ::grpc::Service::MarkMethodRaw(5);
@@ -652,7 +888,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MarkUbatchFinished(::grpc::ServerContext* context, const ::dejavu_ft::UbatchFinishedRequest* request, ::dejavu_ft::UbatchFinishedResponse* response) override {
+    ::grpc::Status MarkUbatchFinished(::grpc::ServerContext* /*context*/, const ::dejavu_ft::UbatchFinishedRequest* /*request*/, ::dejavu_ft::UbatchFinishedResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -663,7 +899,7 @@ class Controller final {
   template <class BaseClass>
   class WithRawMethod_IsReady : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_IsReady() {
       ::grpc::Service::MarkMethodRaw(6);
@@ -672,7 +908,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status IsReady(::grpc::ServerContext* context, const ::dejavu_ft::IsReadyRequest* request, ::dejavu_ft::IsReadyResponse* response) override {
+    ::grpc::Status IsReady(::grpc::ServerContext* /*context*/, const ::dejavu_ft::IsReadyRequest* /*request*/, ::dejavu_ft::IsReadyResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -683,7 +919,7 @@ class Controller final {
   template <class BaseClass>
   class WithRawMethod_MarkRestart : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithRawMethod_MarkRestart() {
       ::grpc::Service::MarkMethodRaw(7);
@@ -692,7 +928,7 @@ class Controller final {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable synchronous version of this method
-    ::grpc::Status MarkRestart(::grpc::ServerContext* context, const ::dejavu_ft::IsRestartRequest* request, ::dejavu_ft::IsRestartResponse* response) override {
+    ::grpc::Status MarkRestart(::grpc::ServerContext* /*context*/, const ::dejavu_ft::IsRestartRequest* /*request*/, ::dejavu_ft::IsRestartResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -701,19 +937,202 @@ class Controller final {
     }
   };
   template <class BaseClass>
+  class WithRawCallbackMethod_SendHeartbeat : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_SendHeartbeat() {
+      ::grpc::Service::MarkMethodRawCallback(0,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->SendHeartbeat(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_SendHeartbeat() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status SendHeartbeat(::grpc::ServerContext* /*context*/, const ::dejavu_ft::HeartBeatRequest* /*request*/, ::dejavu_ft::HeartBeatResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* SendHeartbeat(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_SendCacheAck : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_SendCacheAck() {
+      ::grpc::Service::MarkMethodRawCallback(1,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->SendCacheAck(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_SendCacheAck() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status SendCacheAck(::grpc::ServerContext* /*context*/, const ::dejavu_ft::CacheRequest* /*request*/, ::dejavu_ft::CacheResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* SendCacheAck(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_SendToken : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_SendToken() {
+      ::grpc::Service::MarkMethodRawCallback(2,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->SendToken(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_SendToken() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status SendToken(::grpc::ServerContext* /*context*/, const ::dejavu_ft::TokenRequest* /*request*/, ::dejavu_ft::TokenResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* SendToken(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_GetInfo : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_GetInfo() {
+      ::grpc::Service::MarkMethodRawCallback(3,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->GetInfo(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_GetInfo() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status GetInfo(::grpc::ServerContext* /*context*/, const ::dejavu_ft::StartUpInfoRequest* /*request*/, ::dejavu_ft::StartUpInfoResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* GetInfo(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_Reset : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_Reset() {
+      ::grpc::Service::MarkMethodRawCallback(4,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->Reset(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_Reset() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status Reset(::grpc::ServerContext* /*context*/, const ::dejavu_ft::ResetRequest* /*request*/, ::dejavu_ft::ResetResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* Reset(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_MarkUbatchFinished : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_MarkUbatchFinished() {
+      ::grpc::Service::MarkMethodRawCallback(5,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->MarkUbatchFinished(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_MarkUbatchFinished() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status MarkUbatchFinished(::grpc::ServerContext* /*context*/, const ::dejavu_ft::UbatchFinishedRequest* /*request*/, ::dejavu_ft::UbatchFinishedResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* MarkUbatchFinished(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_IsReady : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_IsReady() {
+      ::grpc::Service::MarkMethodRawCallback(6,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->IsReady(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_IsReady() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status IsReady(::grpc::ServerContext* /*context*/, const ::dejavu_ft::IsReadyRequest* /*request*/, ::dejavu_ft::IsReadyResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* IsReady(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
+  class WithRawCallbackMethod_MarkRestart : public BaseClass {
+   private:
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
+   public:
+    WithRawCallbackMethod_MarkRestart() {
+      ::grpc::Service::MarkMethodRawCallback(7,
+          new ::grpc::internal::CallbackUnaryHandler< ::grpc::ByteBuffer, ::grpc::ByteBuffer>(
+            [this](
+                   ::grpc::CallbackServerContext* context, const ::grpc::ByteBuffer* request, ::grpc::ByteBuffer* response) { return this->MarkRestart(context, request, response); }));
+    }
+    ~WithRawCallbackMethod_MarkRestart() override {
+      BaseClassMustBeDerivedFromService(this);
+    }
+    // disable synchronous version of this method
+    ::grpc::Status MarkRestart(::grpc::ServerContext* /*context*/, const ::dejavu_ft::IsRestartRequest* /*request*/, ::dejavu_ft::IsRestartResponse* /*response*/) override {
+      abort();
+      return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
+    }
+    virtual ::grpc::ServerUnaryReactor* MarkRestart(
+      ::grpc::CallbackServerContext* /*context*/, const ::grpc::ByteBuffer* /*request*/, ::grpc::ByteBuffer* /*response*/)  { return nullptr; }
+  };
+  template <class BaseClass>
   class WithStreamedUnaryMethod_SendHeartbeat : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_SendHeartbeat() {
       ::grpc::Service::MarkMethodStreamed(0,
-        new ::grpc::internal::StreamedUnaryHandler< ::dejavu_ft::HeartBeatRequest, ::dejavu_ft::HeartBeatResponse>(std::bind(&WithStreamedUnaryMethod_SendHeartbeat<BaseClass>::StreamedSendHeartbeat, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::dejavu_ft::HeartBeatRequest, ::dejavu_ft::HeartBeatResponse>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::dejavu_ft::HeartBeatRequest, ::dejavu_ft::HeartBeatResponse>* streamer) {
+                       return this->StreamedSendHeartbeat(context,
+                         streamer);
+                  }));
     }
     ~WithStreamedUnaryMethod_SendHeartbeat() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status SendHeartbeat(::grpc::ServerContext* context, const ::dejavu_ft::HeartBeatRequest* request, ::dejavu_ft::HeartBeatResponse* response) override {
+    ::grpc::Status SendHeartbeat(::grpc::ServerContext* /*context*/, const ::dejavu_ft::HeartBeatRequest* /*request*/, ::dejavu_ft::HeartBeatResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -723,17 +1142,24 @@ class Controller final {
   template <class BaseClass>
   class WithStreamedUnaryMethod_SendCacheAck : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_SendCacheAck() {
       ::grpc::Service::MarkMethodStreamed(1,
-        new ::grpc::internal::StreamedUnaryHandler< ::dejavu_ft::CacheRequest, ::dejavu_ft::CacheResponse>(std::bind(&WithStreamedUnaryMethod_SendCacheAck<BaseClass>::StreamedSendCacheAck, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::dejavu_ft::CacheRequest, ::dejavu_ft::CacheResponse>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::dejavu_ft::CacheRequest, ::dejavu_ft::CacheResponse>* streamer) {
+                       return this->StreamedSendCacheAck(context,
+                         streamer);
+                  }));
     }
     ~WithStreamedUnaryMethod_SendCacheAck() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status SendCacheAck(::grpc::ServerContext* context, const ::dejavu_ft::CacheRequest* request, ::dejavu_ft::CacheResponse* response) override {
+    ::grpc::Status SendCacheAck(::grpc::ServerContext* /*context*/, const ::dejavu_ft::CacheRequest* /*request*/, ::dejavu_ft::CacheResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -743,17 +1169,24 @@ class Controller final {
   template <class BaseClass>
   class WithStreamedUnaryMethod_SendToken : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_SendToken() {
       ::grpc::Service::MarkMethodStreamed(2,
-        new ::grpc::internal::StreamedUnaryHandler< ::dejavu_ft::TokenRequest, ::dejavu_ft::TokenResponse>(std::bind(&WithStreamedUnaryMethod_SendToken<BaseClass>::StreamedSendToken, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::dejavu_ft::TokenRequest, ::dejavu_ft::TokenResponse>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::dejavu_ft::TokenRequest, ::dejavu_ft::TokenResponse>* streamer) {
+                       return this->StreamedSendToken(context,
+                         streamer);
+                  }));
     }
     ~WithStreamedUnaryMethod_SendToken() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status SendToken(::grpc::ServerContext* context, const ::dejavu_ft::TokenRequest* request, ::dejavu_ft::TokenResponse* response) override {
+    ::grpc::Status SendToken(::grpc::ServerContext* /*context*/, const ::dejavu_ft::TokenRequest* /*request*/, ::dejavu_ft::TokenResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -763,17 +1196,24 @@ class Controller final {
   template <class BaseClass>
   class WithStreamedUnaryMethod_GetInfo : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_GetInfo() {
       ::grpc::Service::MarkMethodStreamed(3,
-        new ::grpc::internal::StreamedUnaryHandler< ::dejavu_ft::StartUpInfoRequest, ::dejavu_ft::StartUpInfoResponse>(std::bind(&WithStreamedUnaryMethod_GetInfo<BaseClass>::StreamedGetInfo, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::dejavu_ft::StartUpInfoRequest, ::dejavu_ft::StartUpInfoResponse>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::dejavu_ft::StartUpInfoRequest, ::dejavu_ft::StartUpInfoResponse>* streamer) {
+                       return this->StreamedGetInfo(context,
+                         streamer);
+                  }));
     }
     ~WithStreamedUnaryMethod_GetInfo() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status GetInfo(::grpc::ServerContext* context, const ::dejavu_ft::StartUpInfoRequest* request, ::dejavu_ft::StartUpInfoResponse* response) override {
+    ::grpc::Status GetInfo(::grpc::ServerContext* /*context*/, const ::dejavu_ft::StartUpInfoRequest* /*request*/, ::dejavu_ft::StartUpInfoResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -783,17 +1223,24 @@ class Controller final {
   template <class BaseClass>
   class WithStreamedUnaryMethod_Reset : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_Reset() {
       ::grpc::Service::MarkMethodStreamed(4,
-        new ::grpc::internal::StreamedUnaryHandler< ::dejavu_ft::ResetRequest, ::dejavu_ft::ResetResponse>(std::bind(&WithStreamedUnaryMethod_Reset<BaseClass>::StreamedReset, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::dejavu_ft::ResetRequest, ::dejavu_ft::ResetResponse>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::dejavu_ft::ResetRequest, ::dejavu_ft::ResetResponse>* streamer) {
+                       return this->StreamedReset(context,
+                         streamer);
+                  }));
     }
     ~WithStreamedUnaryMethod_Reset() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status Reset(::grpc::ServerContext* context, const ::dejavu_ft::ResetRequest* request, ::dejavu_ft::ResetResponse* response) override {
+    ::grpc::Status Reset(::grpc::ServerContext* /*context*/, const ::dejavu_ft::ResetRequest* /*request*/, ::dejavu_ft::ResetResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -803,17 +1250,24 @@ class Controller final {
   template <class BaseClass>
   class WithStreamedUnaryMethod_MarkUbatchFinished : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_MarkUbatchFinished() {
       ::grpc::Service::MarkMethodStreamed(5,
-        new ::grpc::internal::StreamedUnaryHandler< ::dejavu_ft::UbatchFinishedRequest, ::dejavu_ft::UbatchFinishedResponse>(std::bind(&WithStreamedUnaryMethod_MarkUbatchFinished<BaseClass>::StreamedMarkUbatchFinished, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::dejavu_ft::UbatchFinishedRequest, ::dejavu_ft::UbatchFinishedResponse>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::dejavu_ft::UbatchFinishedRequest, ::dejavu_ft::UbatchFinishedResponse>* streamer) {
+                       return this->StreamedMarkUbatchFinished(context,
+                         streamer);
+                  }));
     }
     ~WithStreamedUnaryMethod_MarkUbatchFinished() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status MarkUbatchFinished(::grpc::ServerContext* context, const ::dejavu_ft::UbatchFinishedRequest* request, ::dejavu_ft::UbatchFinishedResponse* response) override {
+    ::grpc::Status MarkUbatchFinished(::grpc::ServerContext* /*context*/, const ::dejavu_ft::UbatchFinishedRequest* /*request*/, ::dejavu_ft::UbatchFinishedResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -823,17 +1277,24 @@ class Controller final {
   template <class BaseClass>
   class WithStreamedUnaryMethod_IsReady : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_IsReady() {
       ::grpc::Service::MarkMethodStreamed(6,
-        new ::grpc::internal::StreamedUnaryHandler< ::dejavu_ft::IsReadyRequest, ::dejavu_ft::IsReadyResponse>(std::bind(&WithStreamedUnaryMethod_IsReady<BaseClass>::StreamedIsReady, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::dejavu_ft::IsReadyRequest, ::dejavu_ft::IsReadyResponse>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::dejavu_ft::IsReadyRequest, ::dejavu_ft::IsReadyResponse>* streamer) {
+                       return this->StreamedIsReady(context,
+                         streamer);
+                  }));
     }
     ~WithStreamedUnaryMethod_IsReady() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status IsReady(::grpc::ServerContext* context, const ::dejavu_ft::IsReadyRequest* request, ::dejavu_ft::IsReadyResponse* response) override {
+    ::grpc::Status IsReady(::grpc::ServerContext* /*context*/, const ::dejavu_ft::IsReadyRequest* /*request*/, ::dejavu_ft::IsReadyResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }
@@ -843,17 +1304,24 @@ class Controller final {
   template <class BaseClass>
   class WithStreamedUnaryMethod_MarkRestart : public BaseClass {
    private:
-    void BaseClassMustBeDerivedFromService(const Service *service) {}
+    void BaseClassMustBeDerivedFromService(const Service* /*service*/) {}
    public:
     WithStreamedUnaryMethod_MarkRestart() {
       ::grpc::Service::MarkMethodStreamed(7,
-        new ::grpc::internal::StreamedUnaryHandler< ::dejavu_ft::IsRestartRequest, ::dejavu_ft::IsRestartResponse>(std::bind(&WithStreamedUnaryMethod_MarkRestart<BaseClass>::StreamedMarkRestart, this, std::placeholders::_1, std::placeholders::_2)));
+        new ::grpc::internal::StreamedUnaryHandler<
+          ::dejavu_ft::IsRestartRequest, ::dejavu_ft::IsRestartResponse>(
+            [this](::grpc::ServerContext* context,
+                   ::grpc::ServerUnaryStreamer<
+                     ::dejavu_ft::IsRestartRequest, ::dejavu_ft::IsRestartResponse>* streamer) {
+                       return this->StreamedMarkRestart(context,
+                         streamer);
+                  }));
     }
     ~WithStreamedUnaryMethod_MarkRestart() override {
       BaseClassMustBeDerivedFromService(this);
     }
     // disable regular version of this method
-    ::grpc::Status MarkRestart(::grpc::ServerContext* context, const ::dejavu_ft::IsRestartRequest* request, ::dejavu_ft::IsRestartResponse* response) override {
+    ::grpc::Status MarkRestart(::grpc::ServerContext* /*context*/, const ::dejavu_ft::IsRestartRequest* /*request*/, ::dejavu_ft::IsRestartResponse* /*response*/) override {
       abort();
       return ::grpc::Status(::grpc::StatusCode::UNIMPLEMENTED, "");
     }

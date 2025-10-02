@@ -22,4 +22,3 @@ set(parallel_gpt_triton_backend_files
 add_library(GptNeoXTritonBackend STATIC ${parallel_gpt_triton_backend_files})
 set_property(TARGET GptNeoXTritonBackend PROPERTY POSITION_INDEPENDENT_CODE  ON)
 target_link_libraries(GptNeoXTritonBackend PRIVATE TransformerTritonBackend GptNeoX tensor memory_utils -lcublasLt)
-target_compile_features(GptNeoXTritonBackend PRIVATE cxx_std_14)

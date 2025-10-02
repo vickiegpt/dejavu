@@ -16,6 +16,9 @@
 
 #include "cuda_fp8_utils.h"
 
+#include <cstdio>
+#include <math.h>
+
 namespace fastertransformer {
 #ifdef ENABLE_FP8
 
@@ -91,17 +94,19 @@ template void invokeFakeQuantize<__nv_bfloat16, __nv_bfloat16, __nv_fp8_e4m3>(__
 template<typename T_W>
 __global__ void computeFP8QuantizeScale(float* quant_ptr, const T_W* weights, const int k, const int n)
 {
-    float max = -10000.f;
+    float max_val = -10000.f;
     for (int i = 0; i < k; i++) {
-        float val = fabs((float)weights[i * n + blockIdx.x * blockDim.x + threadIdx.x]);
-        max       = max > val ? max : val;
+        float val = fabsf(static_cast<float>(weights[i * n + blockIdx.x * blockDim.x + threadIdx.x]));
+        max_val   = max_val > val ? max_val : val;
         if (threadIdx.x == 0 && blockIdx.x == 0 && i % 100 == 0) {
-            printf("max: %f, val: %f \n", max, val);
+            printf("max: %f, val: %f \n", max_val, val);
         }
     }
-    // quant_ptr[blockIdx.x * blockDim.x + threadIdx.x] = 1.0f;
-    // quant_ptr[blockIdx.x * blockDim.x + threadIdx.x] = FP8_E4M3_MAX / max;
-    quant_ptr[blockIdx.x * blockDim.x + threadIdx.x] = std::max(max / FP8_E4M3_MAX, 1.0f / 32.f);
+    float scale = max_val / FP8_E4M3_MAX;
+    if (scale < 1.0f / 32.f) {
+        scale = 1.0f / 32.f;
+    }
+    quant_ptr[blockIdx.x * blockDim.x + threadIdx.x] = scale;
 }
 
 template<typename T_W>

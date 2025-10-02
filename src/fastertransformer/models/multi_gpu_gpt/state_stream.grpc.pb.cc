@@ -6,15 +6,19 @@
 #include "state_stream.grpc.pb.h"
 
 #include <functional>
-#include <grpcpp/impl/codegen/async_stream.h>
-#include <grpcpp/impl/codegen/async_unary_call.h>
-#include <grpcpp/impl/codegen/channel_interface.h>
-#include <grpcpp/impl/codegen/client_unary_call.h>
-#include <grpcpp/impl/codegen/client_callback.h>
-#include <grpcpp/impl/codegen/method_handler_impl.h>
-#include <grpcpp/impl/codegen/rpc_service_method.h>
-#include <grpcpp/impl/codegen/service_type.h>
-#include <grpcpp/impl/codegen/sync_stream.h>
+#include <grpcpp/support/async_stream.h>
+#include <grpcpp/support/async_unary_call.h>
+#include <grpcpp/impl/channel_interface.h>
+#include <grpcpp/impl/client_unary_call.h>
+#include <grpcpp/support/client_callback.h>
+#include <grpcpp/support/message_allocator.h>
+#include <grpcpp/support/method_handler.h>
+#include <grpcpp/impl/rpc_service_method.h>
+#include <grpcpp/support/server_callback.h>
+#include <grpcpp/impl/codegen/server_callback_handlers.h>
+#include <grpcpp/server_context.h>
+#include <grpcpp/impl/service_type.h>
+#include <grpcpp/support/sync_stream.h>
 namespace dejavu {
 
 static const char* DejaVuManager_method_names[] = {
@@ -24,58 +28,82 @@ static const char* DejaVuManager_method_names[] = {
 
 std::unique_ptr< DejaVuManager::Stub> DejaVuManager::NewStub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options) {
   (void)options;
-  std::unique_ptr< DejaVuManager::Stub> stub(new DejaVuManager::Stub(channel));
+  std::unique_ptr< DejaVuManager::Stub> stub(new DejaVuManager::Stub(channel, options));
   return stub;
 }
 
-DejaVuManager::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel)
-  : channel_(channel), rpcmethod_Push_(DejaVuManager_method_names[0], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
-  , rpcmethod_Complete_(DejaVuManager_method_names[1], ::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+DejaVuManager::Stub::Stub(const std::shared_ptr< ::grpc::ChannelInterface>& channel, const ::grpc::StubOptions& options)
+  : channel_(channel), rpcmethod_Push_(DejaVuManager_method_names[0], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
+  , rpcmethod_Complete_(DejaVuManager_method_names[1], options.suffix_for_stats(),::grpc::internal::RpcMethod::NORMAL_RPC, channel)
   {}
 
 ::grpc::Status DejaVuManager::Stub::Push(::grpc::ClientContext* context, const ::dejavu::PushRequest& request, ::dejavu::PushResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_Push_, context, request, response);
+  return ::grpc::internal::BlockingUnaryCall< ::dejavu::PushRequest, ::dejavu::PushResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_Push_, context, request, response);
 }
 
-void DejaVuManager::Stub::experimental_async::Push(::grpc::ClientContext* context, const ::dejavu::PushRequest* request, ::dejavu::PushResponse* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_Push_, context, request, response, std::move(f));
+void DejaVuManager::Stub::async::Push(::grpc::ClientContext* context, const ::dejavu::PushRequest* request, ::dejavu::PushResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::dejavu::PushRequest, ::dejavu::PushResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Push_, context, request, response, std::move(f));
 }
 
-::grpc::ClientAsyncResponseReader< ::dejavu::PushResponse>* DejaVuManager::Stub::AsyncPushRaw(::grpc::ClientContext* context, const ::dejavu::PushRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu::PushResponse>::Create(channel_.get(), cq, rpcmethod_Push_, context, request, true);
+void DejaVuManager::Stub::async::Push(::grpc::ClientContext* context, const ::dejavu::PushRequest* request, ::dejavu::PushResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Push_, context, request, response, reactor);
 }
 
 ::grpc::ClientAsyncResponseReader< ::dejavu::PushResponse>* DejaVuManager::Stub::PrepareAsyncPushRaw(::grpc::ClientContext* context, const ::dejavu::PushRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu::PushResponse>::Create(channel_.get(), cq, rpcmethod_Push_, context, request, false);
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::dejavu::PushResponse, ::dejavu::PushRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_Push_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::dejavu::PushResponse>* DejaVuManager::Stub::AsyncPushRaw(::grpc::ClientContext* context, const ::dejavu::PushRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncPushRaw(context, request, cq);
+  result->StartCall();
+  return result;
 }
 
 ::grpc::Status DejaVuManager::Stub::Complete(::grpc::ClientContext* context, const ::dejavu::CompleteRequest& request, ::dejavu::CompleteResponse* response) {
-  return ::grpc::internal::BlockingUnaryCall(channel_.get(), rpcmethod_Complete_, context, request, response);
+  return ::grpc::internal::BlockingUnaryCall< ::dejavu::CompleteRequest, ::dejavu::CompleteResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), rpcmethod_Complete_, context, request, response);
 }
 
-void DejaVuManager::Stub::experimental_async::Complete(::grpc::ClientContext* context, const ::dejavu::CompleteRequest* request, ::dejavu::CompleteResponse* response, std::function<void(::grpc::Status)> f) {
-  return ::grpc::internal::CallbackUnaryCall(stub_->channel_.get(), stub_->rpcmethod_Complete_, context, request, response, std::move(f));
+void DejaVuManager::Stub::async::Complete(::grpc::ClientContext* context, const ::dejavu::CompleteRequest* request, ::dejavu::CompleteResponse* response, std::function<void(::grpc::Status)> f) {
+  ::grpc::internal::CallbackUnaryCall< ::dejavu::CompleteRequest, ::dejavu::CompleteResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Complete_, context, request, response, std::move(f));
 }
 
-::grpc::ClientAsyncResponseReader< ::dejavu::CompleteResponse>* DejaVuManager::Stub::AsyncCompleteRaw(::grpc::ClientContext* context, const ::dejavu::CompleteRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu::CompleteResponse>::Create(channel_.get(), cq, rpcmethod_Complete_, context, request, true);
+void DejaVuManager::Stub::async::Complete(::grpc::ClientContext* context, const ::dejavu::CompleteRequest* request, ::dejavu::CompleteResponse* response, ::grpc::ClientUnaryReactor* reactor) {
+  ::grpc::internal::ClientCallbackUnaryFactory::Create< ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(stub_->channel_.get(), stub_->rpcmethod_Complete_, context, request, response, reactor);
 }
 
 ::grpc::ClientAsyncResponseReader< ::dejavu::CompleteResponse>* DejaVuManager::Stub::PrepareAsyncCompleteRaw(::grpc::ClientContext* context, const ::dejavu::CompleteRequest& request, ::grpc::CompletionQueue* cq) {
-  return ::grpc::internal::ClientAsyncResponseReaderFactory< ::dejavu::CompleteResponse>::Create(channel_.get(), cq, rpcmethod_Complete_, context, request, false);
+  return ::grpc::internal::ClientAsyncResponseReaderHelper::Create< ::dejavu::CompleteResponse, ::dejavu::CompleteRequest, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(channel_.get(), cq, rpcmethod_Complete_, context, request);
+}
+
+::grpc::ClientAsyncResponseReader< ::dejavu::CompleteResponse>* DejaVuManager::Stub::AsyncCompleteRaw(::grpc::ClientContext* context, const ::dejavu::CompleteRequest& request, ::grpc::CompletionQueue* cq) {
+  auto* result =
+    this->PrepareAsyncCompleteRaw(context, request, cq);
+  result->StartCall();
+  return result;
 }
 
 DejaVuManager::Service::Service() {
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       DejaVuManager_method_names[0],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< DejaVuManager::Service, ::dejavu::PushRequest, ::dejavu::PushResponse>(
-          std::mem_fn(&DejaVuManager::Service::Push), this)));
+      new ::grpc::internal::RpcMethodHandler< DejaVuManager::Service, ::dejavu::PushRequest, ::dejavu::PushResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](DejaVuManager::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::dejavu::PushRequest* req,
+             ::dejavu::PushResponse* resp) {
+               return service->Push(ctx, req, resp);
+             }, this)));
   AddMethod(new ::grpc::internal::RpcServiceMethod(
       DejaVuManager_method_names[1],
       ::grpc::internal::RpcMethod::NORMAL_RPC,
-      new ::grpc::internal::RpcMethodHandler< DejaVuManager::Service, ::dejavu::CompleteRequest, ::dejavu::CompleteResponse>(
-          std::mem_fn(&DejaVuManager::Service::Complete), this)));
+      new ::grpc::internal::RpcMethodHandler< DejaVuManager::Service, ::dejavu::CompleteRequest, ::dejavu::CompleteResponse, ::grpc::protobuf::MessageLite, ::grpc::protobuf::MessageLite>(
+          [](DejaVuManager::Service* service,
+             ::grpc::ServerContext* ctx,
+             const ::dejavu::CompleteRequest* req,
+             ::dejavu::CompleteResponse* resp) {
+               return service->Complete(ctx, req, resp);
+             }, this)));
 }
 
 DejaVuManager::Service::~Service() {

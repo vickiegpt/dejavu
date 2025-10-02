@@ -20,9 +20,11 @@
 #include <cublasLt.h>
 #include <cublas_v2.h>
 #include <cuda_runtime.h>
+#include <array>
 #include <map>
 #include <mutex>
 #include <string>
+#include <tuple>
 
 #pragma once
 namespace fastertransformer {
@@ -124,7 +126,49 @@ public:
 
     using MatrixLayout = std::tuple<cudaDataType_t, cublasLtOrder_t, uint64_t, uint64_t>;
     using cache_idx_t  = std::tuple<cublasLtMatmulDesc_t, std::array<MatrixLayout, 4>>;
-    std::map<cache_idx_t, cublasLtMatmulAlgo_t> algo_cache;
+
+    struct CacheIdxLess {
+        bool operator()(const cache_idx_t& lhs, const cache_idx_t& rhs) const
+        {
+            auto lhs_desc = std::get<0>(lhs);
+            auto rhs_desc = std::get<0>(rhs);
+            if (lhs_desc != rhs_desc) {
+                return lhs_desc < rhs_desc;
+            }
+
+            const auto& lhs_layouts = std::get<1>(lhs);
+            const auto& rhs_layouts = std::get<1>(rhs);
+            for (size_t i = 0; i < lhs_layouts.size(); ++i) {
+                const auto& lhs_layout = lhs_layouts[i];
+                const auto& rhs_layout = rhs_layouts[i];
+
+                if (layoutLess(lhs_layout, rhs_layout)) {
+                    return true;
+                }
+                if (layoutLess(rhs_layout, lhs_layout)) {
+                    return false;
+                }
+            }
+            return false;
+        }
+
+    private:
+        static bool layoutLess(const MatrixLayout& lhs, const MatrixLayout& rhs)
+        {
+            if (std::get<0>(lhs) != std::get<0>(rhs)) {
+                return std::get<0>(lhs) < std::get<0>(rhs);
+            }
+            if (std::get<1>(lhs) != std::get<1>(rhs)) {
+                return std::get<1>(lhs) < std::get<1>(rhs);
+            }
+            if (std::get<2>(lhs) != std::get<2>(rhs)) {
+                return std::get<2>(lhs) < std::get<2>(rhs);
+            }
+            return std::get<3>(lhs) < std::get<3>(rhs);
+        }
+    };
+
+    std::map<cache_idx_t, cublasLtMatmulAlgo_t, CacheIdxLess> algo_cache;
 
     MatrixLayout createMatrixLayout(cublasLtMatrixLayout_t Mdesc);
 

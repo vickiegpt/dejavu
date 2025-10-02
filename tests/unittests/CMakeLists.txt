@@ -36,7 +36,7 @@ add_executable(unittest
 
 # automatic discovery of unit tests
 target_link_libraries(unittest PUBLIC "${TORCH_LIBRARIES}" gtest_main)
-target_compile_features(unittest PRIVATE cxx_std_14)
+
 
 # Sorted by alphabetical order of test name.
 target_link_libraries(  # Libs for test_attention_kernels

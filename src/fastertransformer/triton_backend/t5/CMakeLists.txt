@@ -22,4 +22,3 @@ set(t5_triton_backend_files
 add_library(T5TritonBackend STATIC ${t5_triton_backend_files})
 set_property(TARGET T5TritonBackend PROPERTY POSITION_INDEPENDENT_CODE  ON)
 target_link_libraries(T5TritonBackend PRIVATE TransformerTritonBackend T5Encoder T5Decoding -lcublasLt)
-target_compile_features(T5TritonBackend PRIVATE cxx_std_14)

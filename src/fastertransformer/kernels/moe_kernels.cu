@@ -17,6 +17,7 @@
 #include <cuda.h>
 #include <cuda_fp16.h>
 #include <math.h>
+#include <cfloat>
 #include <sstream>
 
 // Ignore CUTLASS warnings about type punning
