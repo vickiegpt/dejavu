@@ -13,4 +13,4 @@
 # limitations under the License.
 
 add_library(th_gpt SHARED GptOp.cc)
-target_link_libraries(th_gpt PRIVATE "${TORCH_LIBRARIES}" ParallelGpt ParallelGpt th_utils)
+target_link_libraries(th_gpt PRIVATE torch ParallelGpt ParallelGpt th_utils)

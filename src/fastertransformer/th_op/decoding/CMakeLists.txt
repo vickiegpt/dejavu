@@ -14,8 +14,8 @@
 
 add_library(th_decoding STATIC DecodingOp.cc)
 set_property(TARGET th_decoding PROPERTY POSITION_INDEPENDENT_CODE  ON)
-target_link_libraries(th_decoding PRIVATE "${TORCH_LIBRARIES}" Decoding th_utils)
+target_link_libraries(th_decoding PRIVATE torch Decoding th_utils)
 
 add_library(th_gather_tree STATIC GatherTreeOp.cc)
 set_property(TARGET th_gather_tree PROPERTY POSITION_INDEPENDENT_CODE  ON)
-target_link_libraries(th_gather_tree PRIVATE "${TORCH_LIBRARIES}" decoding_kernels th_utils)
+target_link_libraries(th_gather_tree PRIVATE torch decoding_kernels th_utils)

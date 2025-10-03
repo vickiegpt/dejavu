@@ -14,4 +14,4 @@
 
 add_library(th_bert STATIC BertOp.cc BertINT8Op.cc WeightQuantizeOp.cc)
 set_property(TARGET th_bert PROPERTY POSITION_INDEPENDENT_CODE  ON)
-target_link_libraries(th_bert PRIVATE "${TORCH_LIBRARIES}" Bert BertINT8 nccl_utils th_utils quantize_weight)
+target_link_libraries(th_bert PRIVATE torch Bert BertINT8 nccl_utils th_utils quantize_weight)

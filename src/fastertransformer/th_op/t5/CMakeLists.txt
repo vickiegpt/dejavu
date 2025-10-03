@@ -14,4 +14,4 @@
 
 add_library(th_t5 STATIC T5EncoderOp.cc T5DecodingOp.cc)
 set_property(TARGET th_t5 PROPERTY POSITION_INDEPENDENT_CODE  ON)
-target_link_libraries(th_t5 PRIVATE "${TORCH_LIBRARIES}" T5Encoder T5Decoder T5Decoding th_utils nccl_utils)
+target_link_libraries(th_t5 PRIVATE torch T5Encoder T5Decoder T5Decoding th_utils nccl_utils)

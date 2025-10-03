@@ -20,7 +20,7 @@ endif()
 add_library(th_utils STATIC th_utils.cu)
 set_property(TARGET th_utils PROPERTY POSITION_INDEPENDENT_CODE  ON)
 set_property(TARGET th_utils PROPERTY CUDA_RESOLVE_DEVICE_SYMBOLS  ON)
-target_link_libraries(th_utils PUBLIC "${TORCH_LIBRARIES}" -lcublas -lcudart -lcurand tensor)
+target_link_libraries(th_utils PUBLIC torch -lcublas -lcudart -lcurand tensor)
 
 add_subdirectory(common)
 add_subdirectory(decoder)
@@ -54,7 +54,7 @@ add_library(th_transformer SHARED
             $<TARGET_OBJECTS:th_utils>
             $<TARGET_OBJECTS:th_vit>
 )
-target_link_libraries(th_transformer PUBLIC "${TORCH_LIBRARIES}"
+target_link_libraries(th_transformer PUBLIC torch
                       th_bart
                       th_bert
                       th_common

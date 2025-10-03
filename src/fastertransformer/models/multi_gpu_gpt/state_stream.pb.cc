@@ -16,7 +16,12 @@
 #include <google/protobuf/port_def.inc>
 
 PROTOBUF_PRAGMA_INIT_SEG
-
+ std::string google::protobuf::Message::GetTypeName() const{
+  return GetDescriptor()->full_name();
+}
+ std::string google::protobuf::Message::InitializationErrorString() const{
+  return "";
+}
 namespace _pb = ::PROTOBUF_NAMESPACE_ID;
 namespace _pbi = _pb::internal;
 

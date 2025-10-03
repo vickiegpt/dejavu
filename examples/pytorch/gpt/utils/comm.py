@@ -84,10 +84,23 @@ def initialize_model_parallel(world_size: int, rank: int, backend="mpi"):
 
     print(f'Initializing tensor and pipeline parallel, world size is {world_size}, rank is {rank}')
     # do we need to pass rank here?
+    # Note: Using NCCL backend since MPI is not available in this PyTorch build
+    # For single GPU or CUDA workloads, NCCL is the recommended backend
     if backend=="mpi":
-        dist.init_process_group(backend=dist.Backend.MPI, world_size=world_size, rank=rank)
+        print("Warning: MPI backend requested but not available. Falling back to NCCL.")
+        dist.init_process_group(
+            backend=dist.Backend.NCCL, 
+            init_method='tcp://localhost:23456',
+            world_size=world_size, 
+            rank=rank
+        )
     else:
-        dist.init_process_group(backend=dist.Backend.NCCL, world_size=world_size, rank=rank)
+        dist.init_process_group(
+            backend=dist.Backend.NCCL, 
+            init_method='tcp://localhost:23456',
+            world_size=world_size, 
+            rank=rank
+        )
     print("After init!")
 
 def init_group(tensor_para_size: int,

@@ -14,6 +14,10 @@
 cmake_minimum_required(VERSION 3.8 FATAL_ERROR) # for PyTorch extensions, version should be greater than 3.13
 project(FasterTransformer LANGUAGES CXX CUDA)
 
+set(CMAKE_INCLUDE_DIRECTORIES_BEFORE ON)
+
+include_directories(BEFORE ${PROJECT_SOURCE_DIR}/third_party/protobuf/include)
+
 find_package(CUDA 10.2 REQUIRED)
 
 if(${CUDA_VERSION_MAJOR} VERSION_GREATER_EQUAL "11")
@@ -31,6 +35,7 @@ endif()
 
 set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
 find_package(CUDNN)
+find_package(Protobuf REQUIRED)
 
 option(BUILD_CUTLASS_MOE "Builds CUTLASS kernels supporting MoE GEMM" ON)
 if(BUILD_CUTLASS_MOE)
@@ -93,6 +98,14 @@ if(BUILD_MULTI_GPU)
   set(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake/Modules)
   find_package(NCCL REQUIRED)
   set(CMAKE_MODULE_PATH "") # prevent the bugs for pytorch building
+endif()
+
+set(Torch_USE_STATIC_LIBS OFF)
+list(APPEND CMAKE_PREFIX_PATH /usr/local/lib/python3.12/dist-packages/torch)
+find_package(Torch REQUIRED)
+if(Torch_FOUND AND TARGET torch AND NOT TARGET Torch::Torch)
+  add_library(Torch::Torch INTERFACE IMPORTED)
+  set_property(TARGET Torch::Torch PROPERTY INTERFACE_LINK_LIBRARIES torch)
 endif()
 
 if(BUILD_PYT)
@@ -221,6 +234,7 @@ set(COMMON_HEADER_DIRS
   ${PROJECT_SOURCE_DIR}/3rdparty/trt_fp8_fmha/src
   ${PROJECT_SOURCE_DIR}/3rdparty/trt_fp8_fmha/generated
 )
+list(PREPEND COMMON_HEADER_DIRS ${Protobuf_INCLUDE_DIRS})
 message("-- COMMON_HEADER_DIRS: ${COMMON_HEADER_DIRS}")
 
 set(COMMON_LIB_DIRS
@@ -245,28 +259,62 @@ if(BUILD_TF2)
   add_definitions(-D_GLIBCXX_USE_CXX11_ABI=1)
 endif()
 
-set(PYTHON_PATH "python3.8")
 if(BUILD_PYT)
-	execute_process(COMMAND ${PYTHON_PATH} "-c"  "from __future__ import print_function; import torch; print(torch.__version__,end='');"
-                  RESULT_VARIABLE _PYTHON_SUCCESS
-                  OUTPUT_VARIABLE TORCH_VERSION)
-  execute_process(COMMAND ${PYTHON_PATH} "-c" "from __future__ import print_function; import os; import torch;
-print(os.path.dirname(torch.__file__),end='');"
-                  RESULT_VARIABLE _PYTHON_SUCCESS
-                  OUTPUT_VARIABLE TORCH_DIR)
-  list(APPEND CMAKE_PREFIX_PATH /usr/local/lib/python3.12/dist-packages/torch)
-  find_package(Torch REQUIRED)
-  execute_process(COMMAND ${PYTHON_PATH} "-c" "from __future__ import print_function; from distutils import sysconfig;
-print(sysconfig.get_python_inc());"
-                  RESULT_VARIABLE _PYTHON_SUCCESS
-                  OUTPUT_VARIABLE PY_INCLUDE_DIR)
+  if(NOT DEFINED PYTHON_PATH OR PYTHON_PATH STREQUAL "")
+    find_package(Python3 COMPONENTS Interpreter)
+    if(Python3_Interpreter_FOUND)
+      set(PYTHON_PATH ${Python3_EXECUTABLE})
+    else()
+      message(FATAL_ERROR "Python interpreter not found. Set PYTHON_PATH to a valid executable.")
+    endif()
+  endif()
+
+  execute_process(
+    COMMAND ${PYTHON_PATH} "-c"
+            "from __future__ import print_function; import torch; print(torch.__version__, end='');"
+    RESULT_VARIABLE _PYTHON_SUCCESS
+    OUTPUT_VARIABLE TORCH_VERSION
+    ERROR_VARIABLE _PYTHON_STDERR
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(NOT _PYTHON_SUCCESS EQUAL "0")
+    message(FATAL_ERROR "Failed to query torch version using ${PYTHON_PATH}: ${_PYTHON_STDERR}")
+  endif()
+
+  execute_process(
+    COMMAND ${PYTHON_PATH} "-c"
+            "from __future__ import print_function; import os, torch; print(os.path.dirname(torch.__file__), end='');"
+    RESULT_VARIABLE _PYTHON_SUCCESS
+    OUTPUT_VARIABLE TORCH_DIR
+    ERROR_VARIABLE _PYTHON_STDERR
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(NOT _PYTHON_SUCCESS EQUAL "0")
+    message(FATAL_ERROR "Failed to locate torch directory using ${PYTHON_PATH}: ${_PYTHON_STDERR}")
+  endif()
+
+  execute_process(
+    COMMAND ${PYTHON_PATH} "-c"
+            "from __future__ import print_function; from distutils import sysconfig; print(sysconfig.get_python_inc(), end='');"
+    RESULT_VARIABLE _PYTHON_SUCCESS
+    OUTPUT_VARIABLE PY_INCLUDE_DIR
+    ERROR_VARIABLE _PYTHON_STDERR
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(NOT _PYTHON_SUCCESS EQUAL "0")
+    message(FATAL_ERROR "Failed to obtain Python include directory using ${PYTHON_PATH}: ${_PYTHON_STDERR}")
+  endif()
   list(APPEND COMMON_HEADER_DIRS ${PY_INCLUDE_DIR})
-  execute_process(COMMAND ${PYTHON_PATH} "-c" "from __future__ import print_function; import torch;
-print(torch._C._GLIBCXX_USE_CXX11_ABI,end='');"
-                  RESULT_VARIABLE _PYTHON_SUCCESS
-                  OUTPUT_VARIABLE USE_CXX11_ABI)
+
+  execute_process(
+    COMMAND ${PYTHON_PATH} "-c"
+            "from __future__ import print_function; import torch; print(torch._C._GLIBCXX_USE_CXX11_ABI, end='');"
+    RESULT_VARIABLE _PYTHON_SUCCESS
+    OUTPUT_VARIABLE USE_CXX11_ABI
+    ERROR_VARIABLE _PYTHON_STDERR
+    OUTPUT_STRIP_TRAILING_WHITESPACE)
+  if(NOT _PYTHON_SUCCESS EQUAL "0")
+    message(FATAL_ERROR "Failed to query torch._C._GLIBCXX_USE_CXX11_ABI using ${PYTHON_PATH}: ${_PYTHON_STDERR}")
+  endif()
   message("-- USE_CXX11_ABI=${USE_CXX11_ABI}")
-  if (USE_CXX11_ABI)
+  if(USE_CXX11_ABI)
     set(CMAKE_CUDA_FLAGS_RELEASE "${CMAKE_CUDA_FLAGS_RELEASE} -D_GLIBCXX_USE_CXX11_ABI=1")
     set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -D_GLIBCXX_USE_CXX11_ABI=1")
     set(CMAKE_CUDA_FLAGS_DEBUG "${CMAKE_CUDA_FLAGS_DEBUG} -D_GLIBCXX_USE_CXX11_ABI=1")
@@ -288,6 +336,7 @@ if(USE_TRITONSERVER_DATATYPE)
   list(APPEND COMMON_HEADER_DIRS ${PROJECT_SOURCE_DIR}/../repo-core-src/include)
 endif()
 
+include_directories(BEFORE ${Protobuf_INCLUDE_DIRS})
 include_directories(
   ${COMMON_HEADER_DIRS}
 )

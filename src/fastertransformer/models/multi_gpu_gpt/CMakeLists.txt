@@ -58,15 +58,18 @@ endif()
 add_library(Controller STATIC Controller.cc  ft_state.grpc.pb.cc ft_state.pb.cc)
 set_property(TARGET Controller PROPERTY POSITION_INDEPENDENT_CODE  ON)
 target_link_libraries(Controller PUBLIC)
+target_include_directories(Controller BEFORE PUBLIC ${Protobuf_INCLUDE_DIRS})
 
 add_library(StateStreamClient STATIC StateStreamClient.cc  state_stream.grpc.pb.cc state_stream.pb.cc)
 set_property(TARGET StateStreamClient PROPERTY POSITION_INDEPENDENT_CODE  ON)
-target_link_libraries(StateStreamClient PUBLIC)
+target_link_libraries(StateStreamClient PUBLIC -lgpr)
+target_include_directories(StateStreamClient BEFORE PUBLIC ${Protobuf_INCLUDE_DIRS})
 
 find_package(Protobuf REQUIRED)
 add_library(StateStreamServer STATIC StateStreamServer.cc)
 set_property(TARGET StateStreamServer PROPERTY POSITION_INDEPENDENT_CODE  ON)
 target_link_libraries(StateStreamServer PUBLIC StateStreamClient)
+target_include_directories(StateStreamServer BEFORE PUBLIC ${Protobuf_INCLUDE_DIRS})
 
 add_library(ParallelGptDecoderLayerWeight STATIC ParallelGptDecoderLayerWeight.cc)
 set_property(TARGET ParallelGptDecoderLayerWeight PROPERTY POSITION_INDEPENDENT_CODE  ON)
@@ -85,6 +88,7 @@ target_link_libraries(ParallelGptContextDecoder PUBLIC -lcudart TensorParallelGe
                                                 TensorParallelGptContextAttentionLayer layernorm_kernels
                                                 add_residual_kernels bert_preprocess_kernels nccl_utils gpt_kernels tensor
                                                 nvtx_utils cuda_utils logger StateStreamServer)
+target_include_directories(ParallelGptContextDecoder BEFORE PUBLIC ${Protobuf_INCLUDE_DIRS})
 
 add_library(ParallelGptDecoder STATIC ParallelGptDecoder.cc)
 set_property(TARGET ParallelGptDecoder PROPERTY POSITION_INDEPENDENT_CODE  ON)
@@ -92,39 +96,45 @@ set_property(TARGET ParallelGptDecoder PROPERTY CUDA_RESOLVE_DEVICE_SYMBOLS  ON)
 target_link_libraries(ParallelGptDecoder PUBLIC -lcudart TensorParallelGeluFfnLayer TensorParallelReluFfnLayer
                                                 TensorParallelDecoderSelfAttentionLayer layernorm_kernels
                                                 add_residual_kernels nccl_utils tensor cuda_utils logger)
+target_include_directories(ParallelGptDecoder BEFORE PUBLIC ${Protobuf_INCLUDE_DIRS})
 
 
 add_library(ControllerClient STATIC ControllerClient.cc  ft_state.grpc.pb.cc ft_state.pb.cc)
 set_property(TARGET ControllerClient PROPERTY POSITION_INDEPENDENT_CODE  ON)
 target_link_libraries(ControllerClient PUBLIC)
+target_include_directories(ControllerClient BEFORE PUBLIC ${Protobuf_INCLUDE_DIRS})
 
 add_library(ParallelGpt STATIC ParallelGpt.cc)
 set_property(TARGET ParallelGpt PROPERTY POSITION_INDEPENDENT_CODE  ON)
 set_property(TARGET ParallelGpt PROPERTY CUDA_RESOLVE_DEVICE_SYMBOLS  ON)
 target_link_libraries(ParallelGpt PUBLIC -lcudart ParallelGptDecoder ParallelGptContextDecoder StateStreamClient decoding_kernels gpt_kernels
                       DynamicDecodeLayer BaseBeamSearchLayer bert_preprocess_kernels gen_relative_pos_bias ParallelGptWeight
-                      custom_ar_comm logprob_kernels cuda_utils logger nvtx_utils cache_utils -lprotobuf -lgrpc -lgrpc++)
+                      custom_ar_comm logprob_kernels cuda_utils logger nvtx_utils cache_utils -lprotobuf -lgrpc -lgrpc++ -lgpr)
+target_include_directories(ParallelGpt BEFORE PUBLIC ${Protobuf_INCLUDE_DIRS})
 
 add_library(ParallelGptDVBaseline STATIC ParallelGptDVBaseline.cc)
 set_property(TARGET ParallelGptDVBaseline PROPERTY POSITION_INDEPENDENT_CODE  ON)
 set_property(TARGET ParallelGptDVBaseline PROPERTY CUDA_RESOLVE_DEVICE_SYMBOLS  ON)
 target_link_libraries(ParallelGptDVBaseline PUBLIC -lcudart ParallelGptDecoder ParallelGptContextDecoder StateStreamClient decoding_kernels gpt_kernels
                       DynamicDecodeLayer BaseBeamSearchLayer bert_preprocess_kernels gen_relative_pos_bias ParallelGptWeight
-                      custom_ar_comm logprob_kernels cuda_utils logger nvtx_utils cache_utils -lprotobuf -lgrpc -lgrpc++)
+                      custom_ar_comm logprob_kernels cuda_utils logger nvtx_utils cache_utils -lprotobuf -lgrpc -lgrpc++ -lgpr)
+target_include_directories(ParallelGptDVBaseline BEFORE PUBLIC ${Protobuf_INCLUDE_DIRS})
 
 add_library(ParallelGptDVBenchmark STATIC ParallelGptDVBenchmark.cc)
 set_property(TARGET ParallelGptDVBenchmark PROPERTY POSITION_INDEPENDENT_CODE  ON)
 set_property(TARGET ParallelGptDVBenchmark PROPERTY CUDA_RESOLVE_DEVICE_SYMBOLS  ON)
 target_link_libraries(ParallelGptDVBenchmark PUBLIC -lcudart ParallelGptDecoder ParallelGptContextDecoder StateStreamClient ControllerClient decoding_kernels gpt_kernels
                       DynamicDecodeLayer BaseBeamSearchLayer bert_preprocess_kernels gen_relative_pos_bias ParallelGptWeight
-                      custom_ar_comm logprob_kernels cuda_utils logger nvtx_utils cache_utils -lprotobuf -lgrpc -lgrpc++)
+                      custom_ar_comm logprob_kernels cuda_utils logger nvtx_utils cache_utils -lprotobuf -lgrpc -lgrpc++ -lgpr)
+target_include_directories(ParallelGptDVBenchmark BEFORE PUBLIC ${Protobuf_INCLUDE_DIRS})
 
 add_library(ParallelGptDVFT STATIC ParallelGptDVFT.cc)
 set_property(TARGET ParallelGptDVFT PROPERTY POSITION_INDEPENDENT_CODE  ON)
 set_property(TARGET ParallelGptDVFT PROPERTY CUDA_RESOLVE_DEVICE_SYMBOLS  ON)
 target_link_libraries(ParallelGptDVFT PUBLIC -lcudart ParallelGptDecoder ParallelGptContextDecoder ControllerClient decoding_kernels gpt_kernels
                       DynamicDecodeLayer BaseBeamSearchLayer bert_preprocess_kernels gen_relative_pos_bias ParallelGptWeight
-                      custom_ar_comm logprob_kernels cuda_utils logger nvtx_utils cache_utils -lprotobuf -lgrpc -lgrpc++)
+                      custom_ar_comm logprob_kernels cuda_utils logger nvtx_utils cache_utils -lprotobuf -lgrpc -lgrpc++ -lgpr)
+target_include_directories(ParallelGptDVFT BEFORE PUBLIC ${Protobuf_INCLUDE_DIRS})
 
 
 add_executable(gpt_gemm gpt_gemm.cc)

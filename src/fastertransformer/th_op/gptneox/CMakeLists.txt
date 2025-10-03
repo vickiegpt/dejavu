@@ -14,4 +14,4 @@
 
 add_library(th_gptneox STATIC GptNeoXOp.cc)
 set_property(TARGET th_gptneox PROPERTY POSITION_INDEPENDENT_CODE  ON)
-target_link_libraries(th_gptneox PRIVATE "${TORCH_LIBRARIES}" GptNeoX th_utils nccl_utils)
+target_link_libraries(th_gptneox PRIVATE torch GptNeoX th_utils nccl_utils)

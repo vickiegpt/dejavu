@@ -19,6 +19,9 @@
 #include <grpcpp/server_context.h>
 #include <grpcpp/impl/service_type.h>
 #include <grpcpp/support/sync_stream.h>
+ absl::debian3::Mutex::~Mutex() {
+   
+ }
 namespace dejavu {
 
 static const char* DejaVuManager_method_names[] = {

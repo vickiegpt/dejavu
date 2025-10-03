@@ -27,7 +27,7 @@ if(BUILD_PYT)
   set_property(TARGET ${LIB_NAME} PROPERTY POSITION_INDEPENDENT_CODE  ON)
   set_target_properties(${LIB_NAME} PROPERTIES
                         CUDA_RESOLVE_DEVICE_SYMBOLS ON)
-  target_link_libraries(${LIB_NAME} "${TORCH_LIBRARIES}" Swin SwinINT8 
+  target_link_libraries(${LIB_NAME} torch Swin SwinINT8 
     cublasINT8MMWrapper cublasAlgoMap trt_fused_multi_head_attention 
     gen_relative_pos_bias quantize_weight transform_mask_kernels
     "${CUDNN_LIBRARY_PATH}" -lcublas -lcudart)

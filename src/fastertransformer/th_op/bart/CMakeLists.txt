@@ -14,4 +14,4 @@
 
 add_library(th_bart STATIC BartEncoderOp.cc BartDecoderOp.cc BartDecodingOp.cc)
 set_property(TARGET th_bart PROPERTY POSITION_INDEPENDENT_CODE  ON)
-target_link_libraries(th_bart PRIVATE "${TORCH_LIBRARIES}" BartEncoder BartDecoder BartDecoding th_utils nccl_utils)
+target_link_libraries(th_bart PRIVATE torch BartEncoder BartDecoder BartDecoding th_utils nccl_utils)

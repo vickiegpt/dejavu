@@ -14,4 +14,4 @@
 
 add_library(th_longformer STATIC LongformerEncoderOp.cc)
 set_property(TARGET th_longformer PROPERTY POSITION_INDEPENDENT_CODE  ON)
-target_link_libraries(th_longformer PRIVATE "${TORCH_LIBRARIES}" LongformerEncoder th_utils)
+target_link_libraries(th_longformer PRIVATE torch LongformerEncoder th_utils)

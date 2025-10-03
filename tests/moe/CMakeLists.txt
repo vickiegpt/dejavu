@@ -23,8 +23,7 @@ if (TORCH_VERSION VERSION_GREATER_EQUAL "1.9.0")
     add_library(${LIB_NAME} SHARED ${moe_test_files})
     set_target_properties(${LIB_NAME} PROPERTIES
                         CUDA_RESOLVE_DEVICE_SYMBOLS ON)
-    target_link_libraries(${LIB_NAME} "${TORCH_LIBRARIES}" moe_kernels logger)
+    target_link_libraries(${LIB_NAME} torch moe_kernels logger)
 else()
     message("TORCH_VERSION ${TORCH_VERSION} < 1.9.0, skipping compiling th_moe_ops.cc because QUInt4x2 is supported after torch 1.9.0")
 endif()
-

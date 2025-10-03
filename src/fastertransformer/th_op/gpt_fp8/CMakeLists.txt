@@ -14,4 +14,4 @@
 
 add_library(th_gpt_fp8 STATIC GptFp8Op.cc)
 set_property(TARGET th_gpt_fp8 PROPERTY POSITION_INDEPENDENT_CODE  ON)
-target_link_libraries(th_gpt_fp8 PRIVATE "${TORCH_LIBRARIES}" GptFP8 th_utils nvtx_utils)
+target_link_libraries(th_gpt_fp8 PRIVATE torch GptFP8 th_utils nvtx_utils)

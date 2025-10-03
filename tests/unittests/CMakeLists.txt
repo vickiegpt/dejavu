@@ -35,7 +35,7 @@ add_executable(unittest
     test_tensor.cu)
 
 # automatic discovery of unit tests
-target_link_libraries(unittest PUBLIC "${TORCH_LIBRARIES}" gtest_main)
+target_link_libraries(unittest PUBLIC torch gtest_main)
 
 
 # Sorted by alphabetical order of test name.

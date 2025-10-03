@@ -14,4 +14,4 @@
 
 add_library(th_deberta STATIC DebertaOp.cc)
 set_property(TARGET th_deberta PROPERTY POSITION_INDEPENDENT_CODE  ON)
-target_link_libraries(th_deberta PRIVATE "${TORCH_LIBRARIES}" Deberta nccl_utils th_utils)
+target_link_libraries(th_deberta PRIVATE torch Deberta nccl_utils th_utils)

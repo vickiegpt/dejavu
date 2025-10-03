@@ -14,4 +14,4 @@
 
 add_library(th_encoder STATIC EncoderOp.cc)
 set_property(TARGET th_encoder PROPERTY POSITION_INDEPENDENT_CODE  ON)
-target_link_libraries(th_encoder PRIVATE "${TORCH_LIBRARIES}" Bert th_utils)
+target_link_libraries(th_encoder PRIVATE torch Bert th_utils)

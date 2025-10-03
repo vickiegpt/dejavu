@@ -15,6 +15,6 @@
 add_library(th_common STATIC
     DynamicDecodeOp.cc WeightOnlyQuantOps.cc GptOps.cc)
 set_property(TARGET th_common PROPERTY POSITION_INDEPENDENT_CODE  ON)
-target_link_libraries(th_common PRIVATE "${TORCH_LIBRARIES}"
+target_link_libraries(th_common PRIVATE torch
     cublasMMWrapper cutlass_preprocessors DynamicDecodeLayer gpt_kernels memory_utils
     th_utils nccl_utils)

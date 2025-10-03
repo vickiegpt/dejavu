@@ -79,28 +79,6 @@ ParallelGptWeight<T>::ParallelGptWeight(const int                               
 template<typename T>
 ParallelGptWeight<T>::~ParallelGptWeight()
 {
-    if (is_maintain_buffer == true) {
-        for (int i = 0; i < weights_ptr.size(); i++) {
-            if (i == 6 && shared_embed_ && weights_ptr[i] == nullptr) {
-                continue;
-            }
-            deviceFree(weights_ptr[i]);
-        }
-
-        position_encoding_table       = nullptr;
-        pre_decoder_embedding_table   = nullptr;
-        pre_decoder_layernorm.gamma   = nullptr;
-        pre_decoder_layernorm.beta    = nullptr;
-        post_decoder_layernorm.beta   = nullptr;
-        post_decoder_layernorm.gamma  = nullptr;
-        post_decoder_embedding.kernel = nullptr;
-        post_decoder_embedding.bias   = nullptr;
-        is_maintain_buffer            = false;
-    }
-
-    for (int i = 0; i < num_layer_; i++) {
-        delete decoder_layer_weights[i];
-    }
 }
 
 template<typename T>
